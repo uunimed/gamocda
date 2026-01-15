@@ -1,1 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24-საათიანი მედდის ცვლები - მოქნილი საათები</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        :root {
+            --shift-color: #2c5aa0;
+            --shift-light: #e8efff;
+            --nurse-9h: #34c759;
+            --nurse-15h: #ff8a4a;
+            --weekend-color: #f8f9fa;
+            --today-color: #fff9e6;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f9ff 0%, #f0f7ff 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--shift-color) 0%, #4a7cff 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: none;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 2px solid #eaeaea;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            color: var(--shift-color);
+            font-size: 1.2rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .shift-config {
+            margin-bottom: 2rem;
+        }
+
+        .nurse-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .nurse-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .nurse-input:focus {
+            border-color: var(--shift-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        .add-nurse-btn {
+            background: var(--shift-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .add-nurse-btn:hover {
+            background: #1a3d7a;
+            transform: translateY(-2px);
+        }
+
+        .nurse-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .nurse-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--shift-color);
+        }
+
+        .nurse-name {
+            font-weight: 500;
+        }
+
+        .remove-nurse-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-nurse-btn:hover {
+            background: #c82333;
+        }
+
+        .hours-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .hour-option {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .hour-option.selected {
+            border-color: var(--shift-color);
+            background: var(--shift-light);
+        }
+
+        .hour-option-9h { border-left: 4px solid var(--nurse-9h); }
+        .hour-option-15h { border-left: 4px solid var(--nurse-15h); }
+
+        .actions-panel {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--shift-color) 0%, #4a7cff 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(44, 90, 160, 0.2);
+        }
+
+        /* Calendar Styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .month-year {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--shift-color);
+        }
+
+        .calendar-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .calendar-table th {
+            background: var(--shift-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .calendar-table td {
+            border: 1px solid #eaeaea;
+            padding: 0.5rem;
+            height: 120px;
+            vertical-align: top;
+            position: relative;
+        }
+
+        .calendar-table td.weekend {
+            background: var(--weekend-color);
+        }
+
+        .calendar-table td.today {
+            background: var(--today-color);
+            border: 2px solid #ffc107;
+        }
+
+        .day-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .shift-info {
+            margin-top: 25px;
+            font-size: 0.8rem;
+        }
+
+        .nurse-assignment {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            margin-top: 5px;
+        }
+
+        .nurse-badge {
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            margin: 1px;
+        }
+
+        .nurse-9h { background: var(--nurse-9h); color: white; }
+        .nurse-15h { background: var(--nurse-15h); color: white; }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--shift-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .color-9h { background: var(--nurse-9h); }
+        .color-15h { background: var(--nurse-15h); }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eaeaea;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .hour-input {
+            width: 60px;
+            padding: 0.25rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .total-hours {
+            font-weight: bold;
+            color: var(--shift-color);
+            margin-left: 10px;
+        }
+
+        .shift-status {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: #f8f9fa;
+        }
+
+        .status-complete { color: #28a745; }
+        .status-incomplete { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <h1 class="main-title">24-საათიანი მედდის ცვლები</h1>
+        <p class="subtitle">მოქნილი საათები (9/15 საათი) • ყოველი 4 დღის შემდეგ • მინიმუმ 2 დღე დასვენება</p>
+    </div>
+
+    <div class="app-container">
+        <!-- Configuration Panel -->
+        <div class="configuration-panel">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-nurse"></i> მედდების მართვა
+                </div>
+                <div class="card-body">
+                    <div class="shift-config">
+                        <h4>მედდების დამატება (2-5 მედდა ცვლაში)</h4>
+                        <div class="nurse-input-group">
+                            <input type="text" class="nurse-input" id="nurse-name-input" placeholder="მედდის სახელი">
+                            <button class="add-nurse-btn" id="add-nurse-btn">დამატება</button>
+                        </div>
+                        
+                        <h5 style="margin-top: 1rem;">სასურველი სამუშაო საათები:</h5>
+                        <div class="hours-options">
+                            <div class="hour-option hour-option-9h" data-hours="9">
+                                <div>9 საათი</div>
+                                <small>მოკლე ცვლა</small>
+                            </div>
+                            <div class="hour-option hour-option-15h" data-hours="15">
+                                <div>15 საათი</div>
+                                <small>გრძელი ცვლა</small>
+                            </div>
+                        </div>
+                        
+                        <h5 style="margin-top: 1rem;">დამატებული მედდები:</h5>
+                        <ul class="nurse-list" id="nurse-list"></ul>
+                    </div>
+
+                    <div class="actions-panel">
+                        <button class="btn-primary-custom" id="generate-schedule">
+                            <i class="fas fa-calendar-alt"></i> განრიგის გენერირება
+                        </button>
+                        <button class="btn-primary-custom" id="save-schedule">
+                            <i class="fas fa-save"></i> შენახვა
+                        </button>
+                        <button class="btn-primary-custom" id="load-schedule">
+                            <i class="fas fa-folder-open"></i> ჩატვირთვა
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar-panel">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-day"></i> თებერვლის განრიგი
+                </div>
+                <div class="card-body">
+                    <div class="calendar-header">
+                        <div class="month-year">თებერვალი 2024</div>
+                        <div class="total-hours">დღის სულ: <span id="daily-total">0</span> საათი</div>
+                    </div>
+
+                    <div class="calendar">
+                        <table class="calendar-table">
+                            <thead>
+                                <tr>
+                                    <th>კვი</th>
+                                    <th>ორშ</th>
+                                    <th>სამ</th>
+                                    <th>ოთხ</th>
+                                    <th>ხუთ</th>
+                                    <th>პარ</th>
+                                    <th>შაბ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendar-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="stats-panel">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-nurses">0</div>
+                            <div class="stat-label">სულ მედდა</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-shifts">0</div>
+                            <div class="stat-label">დაგეგმილი ცვლა</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="avg-workload">0</div>
+                            <div class="stat-label">საშ. საათები</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="compliance">100%</div>
+                            <div class="stat-label">შესაბამისობა</div>
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color color-9h"></div>
+                            <span>9-საათიანი ცვლა</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color color-15h"></div>
+                            <span>15-საათიანი ცვლა</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #28a745;"></div>
+                            <span>24 საათი შევსებული</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #dc3545;"></div>
+                            <span>საათები არასაკმარისი</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>მედდის ცვლების განრიგი • მოქნილი საათები • თებერვალი 2024</p>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <script>
+        class NursingShiftScheduler {
+            constructor() {
+                this.nurses = []; // Array of nurse objects
+                this.schedule = {}; // Schedule for February
+                this.selectedHours = 9; // Default hours
+                this.workCycle = 4; // Work every 4 days
+                this.minRestDays = 2; // Minimum 2 days rest
+                this.hoursPerDay = 24; // Total hours needed per day
+                this.nursesPerDay = 4; // 4 nurses work each day
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadFromLocalStorage();
+                this.initializeEventListeners();
+                this.generateCalendar();
+                this.updateStatistics();
+                this.updateNurseList();
+            }
+            
+            initializeEventListeners() {
+                // Add nurse button
+                document.getElementById('add-nurse-btn').addEventListener('click', () => this.addNurse());
+                
+                // Enter key in input
+                document.getElementById('nurse-name-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addNurse();
+                });
+                
+                // Hour selection
+                document.querySelectorAll('.hour-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        document.querySelectorAll('.hour-option').forEach(o => o.classList.remove('selected'));
+                        e.currentTarget.classList.add('selected');
+                        this.selectedHours = parseInt(e.currentTarget.dataset.hours);
+                    });
+                });
+                
+                // Generate schedule
+                document.getElementById('generate-schedule').addEventListener('click', () => this.generateSchedule());
+                
+                // Save/load
+                document.getElementById('save-schedule').addEventListener('click', () => this.saveToLocalStorage());
+                document.getElementById('load-schedule').addEventListener('click', () => this.loadFromLocalStorage());
+                
+                // Initialize hour selection
+                document.querySelector('.hour-option-9h').classList.add('selected');
+            }
+            
+            addNurse() {
+                const nameInput = document.getElementById('nurse-name-input');
+                const name = nameInput.value.trim();
+                
+                if (!name) {
+                    this.showNotification('გთხოვთ შეიყვანოთ მედდის სახელი', 'error');
+                    return;
+                }
+                
+                if (this.nurses.find(n => n.name === name)) {
+                    this.showNotification('მედდა ასეთი სახელით უკვე არსებობს', 'error');
+                    return;
+                }
+                
+                const nurse = {
+                    id: Date.now(),
+                    name: name,
+                    preferredHours: this.selectedHours,
+                    assignedShifts: 0,
+                    totalHours: 0,
+                    lastWorkDay: 0,
+                    daysWorked: 0,
+                    availability: Array(29).fill(true) // All days available initially
+                };
+                
+                this.nurses.push(nurse);
+                nameInput.value = '';
+                this.updateNurseList();
+                this.updateStatistics();
+                this.showNotification(`მედდა "${name}" დაემატა`, 'success');
+            }
+            
+            updateNurseList() {
+                const list = document.getElementById('nurse-list');
+                list.innerHTML = '';
+                
+                this.nurses.forEach((nurse, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'nurse-item';
+                    li.innerHTML = `
+                        <div>
+                            <span class="nurse-name">${nurse.name}</span>
+                            <small style="color: #666; margin-left: 10px;">${nurse.preferredHours} სთ</small>
+                        </div>
+                        <button class="remove-nurse-btn" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    list.appendChild(li);
+                    
+                    li.querySelector('.remove-nurse-btn').addEventListener('click', (e) => {
+                        const index = parseInt(e.currentTarget.dataset.index);
+                        this.removeNurse(index);
+                    });
+                });
+            }
+            
+            removeNurse(index) {
+                const nurse = this.nurses[index];
+                if (nurse) {
+                    this.nurses.splice(index, 1);
+                    this.updateNurseList();
+                    this.updateStatistics();
+                    this.showNotification(`მედდა "${nurse.name}" წაიშალა`, 'success');
+                }
+            }
+            
+            generateCalendar() {
+                const calendarBody = document.getElementById('calendar-body');
+                calendarBody.innerHTML = '';
+                
+                // February 2024 starts on Thursday (index 4)
+                const startDay = 4; // Thursday
+                const daysInMonth = 29;
+                let currentDay = 1;
+                
+                for (let week = 0; week < 5; week++) {
+                    const row = document.createElement('tr');
+                    
+                    for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                        const cell = document.createElement('td');
+                        
+                        if ((week === 0 && dayOfWeek < startDay) || currentDay > daysInMonth) {
+                            // Empty cell
+                            row.appendChild(cell);
+                            continue;
+                        }
+                        
+                        // Mark weekends
+                        if (dayOfWeek === 0 || dayOfWeek === 6) {
+                            cell.classList.add('weekend');
+                        }
+                        
+                        // Mark today if applicable
+                        const today = new Date();
+                        if (today.getFullYear() === 2024 && today.getMonth() === 1 && today.getDate() === currentDay) {
+                            cell.classList.add('today');
+                        }
+                        
+                        cell.dataset.day = currentDay;
+                        cell.innerHTML = `
+                            <div class="day-number">${currentDay}</div>
+                            <div class="shift-info" id="shift-${currentDay}">
+                                <div class="nurse-assignment" id="assignment-${currentDay}"></div>
+                                <div class="shift-status" id="status-${currentDay}"></div>
+                            </div>
+                        `;
+                        
+                        row.appendChild(cell);
+                        currentDay++;
+                    }
+                    
+                    calendarBody.appendChild(row);
+                }
+            }
+            
+            generateSchedule() {
+                if (this.nurses.length < 4) {
+                    this.showNotification('საკმარისი მედდა არ არის დამატებული. საჭიროა მინიმუმ 4 მედდა.', 'error');
+                    return;
+                }
+                
+                // Reset schedule
+                this.schedule = {};
+                this.resetNurseStats();
+                
+                // Generate schedule for each day
+                for (let day = 1; day <= 29; day++) {
+                    this.scheduleDay(day);
+                }
+                
+                this.updateScheduleDisplay();
+                this.updateStatistics();
+                this.showNotification('განრიგი წარმატებით გენერირდა!', 'success');
+            }
+            
+            scheduleDay(day) {
+                const assignedNurses = [];
+                let totalHours = 0;
+                
+                // Get available nurses for this day
+                const availableNurses = this.getAvailableNurses(day);
+                
+                if (availableNurses.length === 0) {
+                    this.showNotification(`დღე ${day}: არ არის ხელმისაწვდომი მედდა`, 'error');
+                    return;
+                }
+                
+                // Try to assign 4 nurses to cover 24 hours
+                for (let i = 0; i < this.nursesPerDay && i < availableNurses.length; i++) {
+                    const nurse = availableNurses[i];
+                    
+                    // Check if nurse has worked in last 2 days
+                    const daysSinceLastWork = day - nurse.lastWorkDay;
+                    if (nurse.lastWorkDay > 0 && daysSinceLastWork < this.minRestDays) {
+                        continue;
+                    }
+                    
+                    // Check if nurse has worked in last work cycle
+                    if (nurse.daysWorked > 0 && (nurse.daysWorked % this.workCycle === 0)) {
+                        // Nurse should rest
+                        continue;
+                    }
+                    
+                    const hours = nurse.preferredHours;
+                    
+                    // If this would exceed 24 hours, adjust hours
+                    if (totalHours + hours > this.hoursPerDay) {
+                        // Try to find combination of 9h and 15h nurses to reach exactly 24
+                        const remaining = this.hoursPerDay - totalHours;
+                        if (remaining === 9 || remaining === 15) {
+                            // Find nurse who can work remaining hours
+                            const matchingNurse = availableNurses.find(n => 
+                                n !== nurse && 
+                                n.preferredHours === remaining &&
+                                n.lastWorkDay !== day &&
+                                (n.lastWorkDay === 0 || day - n.lastWorkDay >= this.minRestDays)
+                            );
+                            
+                            if (matchingNurse) {
+                                assignedNurses.push({
+                                    nurse: matchingNurse,
+                                    hours: remaining
+                                });
+                                totalHours += remaining;
+                                matchingNurse.totalHours += remaining;
+                                matchingNurse.assignedShifts++;
+                                matchingNurse.lastWorkDay = day;
+                                matchingNurse.daysWorked++;
+                                break;
+                            }
+                        }
+                        // If no perfect match, adjust this nurse's hours
+                        if (totalHours < this.hoursPerDay) {
+                            const adjustedHours = this.hoursPerDay - totalHours;
+                            assignedNurses.push({
+                                nurse: nurse,
+                                hours: adjustedHours
+                            });
+                            totalHours += adjustedHours;
+                            nurse.totalHours += adjustedHours;
+                            nurse.assignedShifts++;
+                            nurse.lastWorkDay = day;
+                            nurse.daysWorked++;
+                            break;
+                        }
+                    } else {
+                        assignedNurses.push({
+                            nurse: nurse,
+                            hours: hours
+                        });
+                        totalHours += hours;
+                        nurse.totalHours += hours;
+                        nurse.assignedShifts++;
+                        nurse.lastWorkDay = day;
+                        nurse.daysWorked++;
+                    }
+                    
+                    // If we've reached 24 hours, stop
+                    if (totalHours >= this.hoursPerDay) {
+                        break;
+                    }
+                }
+                
+                // Store the schedule for this day
+                this.schedule[day] = {
+                    nurses: assignedNurses,
+                    totalHours: totalHours,
+                    isComplete: totalHours === this.hoursPerDay
+                };
+                
+                // If day is not fully covered, try to fill with remaining hours
+                if (totalHours < this.hoursPerDay) {
+                    this.fillRemainingHours(day, totalHours, assignedNurses);
+                }
+            }
+            
+            getAvailableNurses(day) {
+                // Sort nurses by those who have worked less
+                return [...this.nurses].sort((a, b) => {
+                    // Prioritize nurses who haven't worked recently
+                    const aRest = day - a.lastWorkDay;
+                    const bRest = day - b.lastWorkDay;
+                    
+                    if (aRest >= this.minRestDays && bRest < this.minRestDays) return -1;
+                    if (bRest >= this.minRestDays && aRest < this.minRestDays) return 1;
+                    
+                    // Then by total hours worked
+                    return a.totalHours - b.totalHours;
+                });
+            }
+            
+            fillRemainingHours(day, currentTotal, assignedNurses) {
+                const remaining = this.hoursPerDay - currentTotal;
+                if (remaining <= 0) return;
+                
+                // Find available nurses who could work the remaining hours
+                const availableNurses = this.getAvailableNurses(day).filter(nurse => 
+                    !assignedNurses.find(a => a.nurse.id === nurse.id) &&
+                    (nurse.lastWorkDay === 0 || day - nurse.lastWorkDay >= this.minRestDays)
+                );
+                
+                for (const nurse of availableNurses) {
+                    if (remaining === 9 || remaining === 15 || nurse.preferredHours <= remaining) {
+                        assignedNurses.push({
+                            nurse: nurse,
+                            hours: remaining
+                        });
+                        this.schedule[day].totalHours += remaining;
+                        this.schedule[day].isComplete = true;
+                        nurse.totalHours += remaining;
+                        nurse.assignedShifts++;
+                        nurse.lastWorkDay = day;
+                        nurse.daysWorked++;
+                        break;
+                    }
+                }
+            }
+            
+            resetNurseStats() {
+                this.nurses.forEach(nurse => {
+                    nurse.assignedShifts = 0;
+                    nurse.totalHours = 0;
+                    nurse.lastWorkDay = 0;
+                    nurse.daysWorked = 0;
+                });
+            }
+            
+            updateScheduleDisplay() {
+                let dailyTotal = 0;
+                
+                for (let day = 1; day <= 29; day++) {
+                    const assignmentDiv = document.getElementById(`assignment-${day}`);
+                    const statusDiv = document.getElementById(`status-${day}`);
+                    
+                    if (!assignmentDiv) continue;
+                    
+                    assignmentDiv.innerHTML = '';
+                    
+                    if (this.schedule[day]) {
+                        const daySchedule = this.schedule[day];
+                        dailyTotal += daySchedule.totalHours;
+                        
+                        daySchedule.nurses.forEach(assignment => {
+                            const badge = document.createElement('span');
+                            badge.className = `nurse-badge nurse-${assignment.hours}h`;
+                            badge.title = `${assignment.nurse.name} - ${assignment.hours} საათი`;
+                            badge.textContent = `${assignment.nurse.name.charAt(0)}.${assignment.hours}h`;
+                            assignmentDiv.appendChild(badge);
+                        });
+                        
+                        if (daySchedule.isComplete) {
+                            statusDiv.className = 'shift-status status-complete';
+                            statusDiv.textContent = '24/24 საათი';
+                        } else {
+                            statusDiv.className = 'shift-status status-incomplete';
+                            statusDiv.textContent = `${daySchedule.totalHours}/24 საათი`;
+                        }
+                    } else {
+                        statusDiv.className = 'shift-status status-incomplete';
+                        statusDiv.textContent = '0/24 საათი';
+                    }
+                }
+                
+                document.getElementById('daily-total').textContent = dailyTotal;
+            }
+            
+            updateStatistics() {
+                // Total nurses
+                document.getElementById('total-nurses').textContent = this.nurses.length;
+                
+                // Total shifts
+                let totalShifts = 0;
+                Object.values(this.schedule).forEach(day => {
+                    totalShifts += day.nurses?.length || 0;
+                });
+                document.getElementById('total-shifts').textContent = totalShifts;
+                
+                // Average hours per nurse
+                const avgHours = this.nurses.length > 0 
+                    ? (this.nurses.reduce((sum, n) => sum + n.totalHours, 0) / this.nurses.length).toFixed(1)
+                    : '0';
+                document.getElementById('avg-workload').textContent = avgHours;
+                
+                // Compliance rate (days with 24 hours coverage)
+                let completeDays = 0;
+                Object.values(this.schedule).forEach(day => {
+                    if (day.isComplete) completeDays++;
+                });
+                const complianceRate = Object.keys(this.schedule).length > 0 
+                    ? Math.round((completeDays / Object.keys(this.schedule).length) * 100) 
+                    : 100;
+                document.getElementById('compliance').textContent = complianceRate + '%';
+            }
+            
+            saveToLocalStorage() {
+                const data = {
+                    nurses: this.nurses,
+                    schedule: this.schedule,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                localStorage.setItem('nursingSchedule', JSON.stringify(data));
+                this.showNotification('განრიგი შენახულია ლოკალურ მეხსიერებაში', 'success');
+            }
+            
+            loadFromLocalStorage() {
+                const saved = localStorage.getItem('nursingSchedule');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        this.nurses = data.nurses || [];
+                        this.schedule = data.schedule || {};
+                        
+                        // Update UI
+                        this.updateNurseList();
+                        this.updateScheduleDisplay();
+                        this.updateStatistics();
+                        
+                        this.showNotification('განრიგი ჩატვირთულია ლოკალური მეხსიერებიდან', 'success');
+                    } catch (error) {
+                        this.showNotification('შეცდომა ჩატვირთვისას', 'error');
+                    }
+                } else {
+                    this.showNotification('შენახული განრიგი არ მოიძებნა', 'warning');
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                const container = document.getElementById('notification-container');
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                `;
+                
+                container.appendChild(notification);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => {
+                        container.removeChild(notification);
+                    }, 300);
+                }, 5000);
+            }
+        }
+        
+        // Initialize the scheduler
+        document.addEventListener('DOMContentLoaded', () => {
+            window.scheduler = new NursingShiftScheduler();
+        });
+    </script>
+</body>
+</html>
