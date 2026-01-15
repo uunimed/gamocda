@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>მედდის ცვლების განრიგი - 4 მედდა დღეში</title>
+    <title>მედდის ცვლების განრიგი - ავტომატური საათები</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
@@ -204,11 +204,8 @@
             font-size: 0.85rem;
             font-weight: 600;
             color: white;
+            background: var(--primary-color);
         }
-
-        .badge-9h { background: var(--shift-9h); }
-        .badge-15h { background: var(--shift-15h); }
-        .badge-24h { background: var(--shift-24h); }
 
         .nurse-restrictions {
             display: grid;
@@ -261,33 +258,6 @@
             background: #c82333;
             transform: scale(1.1);
         }
-
-        .shift-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .shift-option {
-            text-align: center;
-            padding: 1rem;
-            border: 2px solid #eaeaea;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .shift-option.selected {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        .shift-option-9h { border-left: 4px solid var(--shift-9h); }
-        .shift-option-15h { border-left: 4px solid var(--shift-15h); }
-        .shift-option-24h { border-left: 4px solid var(--shift-24h); }
 
         .actions-panel {
             display: flex;
@@ -562,55 +532,20 @@
             color: #dee2e6;
         }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+        /* Alert Badge */
+        .alert-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--danger-color);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.7rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .modal {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #eaeaea;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
         }
 
         /* Responsive adjustments */
@@ -618,18 +553,28 @@
             .nurse-restrictions {
                 grid-template-columns: 1fr;
             }
-            
-            .shift-options {
-                grid-template-columns: 1fr;
-            }
+        }
+
+        /* Shift Pattern Info */
+        .shift-pattern-info {
+            background: var(--primary-light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .shift-pattern-info ul {
+            margin-bottom: 0;
+            padding-left: 1.2rem;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header-section">
-        <h1 class="main-title">მედდის ცვლების განრიგი</h1>
-        <p class="subtitle">4 მედდა დღეში • მინიმუმ 4 დღე შესვენება • ინდივიდუალური შეზღუდვები</p>
+        <h1 class="main-title">მედდის ცვლების განრიგი - ავტომატური საათები</h1>
+        <p class="subtitle">4 მედდა დღეში • სისტემა თავად ირჩევს საათებს (9/15/24) • 4 დღე შესვენება 24სთ ცვლის შემდეგ</p>
     </div>
 
     <!-- Main Container -->
@@ -650,25 +595,13 @@
                             </button>
                         </div>
                         
-                        <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;">სამუშაო საათები:</h5>
-                        <div class="shift-options">
-                            <div class="shift-option shift-option-9h" data-hours="9">
-                                <div><strong>9 საათი</strong></div>
-                                <small>მოკლე ცვლა</small>
-                            </div>
-                            <div class="shift-option shift-option-15h" data-hours="15">
-                                <div><strong>15 საათი</strong></div>
-                                <small>გრძელი ცვლა</small>
-                            </div>
-                            <div class="shift-option shift-option-24h" data-hours="24">
-                                <div><strong>24 საათი</strong></div>
-                                <small>მთელი დღე</small>
-                            </div>
-                        </div>
-                        
-                        <div class="custom-hours-input" style="display: none; margin-top: 1rem;">
-                            <input type="number" class="nurse-input" id="custom-hours-input" min="1" max="24" placeholder="სხვა საათები">
-                            <button class="btn btn-primary" id="set-custom-hours">დაყენება</button>
+                        <div class="shift-pattern-info">
+                            <p><strong>სისტემა ავტომატურად ანიჭებს საათებს:</strong></p>
+                            <ul>
+                                <li>9 საათი - მოკლე ცვლა</li>
+                                <li>15 საათი - გრძელი ცვლა</li>
+                                <li>24 საათი - მთელი დღე (4 დღე შემდეგ შესვენებით)</li>
+                            </ul>
                         </div>
                     </div>
                     
@@ -698,11 +631,11 @@
                 </div>
                 <div class="card-body">
                     <ol style="padding-left: 1.2rem; margin-bottom: 0;">
-                        <li>დაამატეთ მინიმუმ 8-10 მედდა</li>
-                        <li>დააყენეთ თითოეული მედდის სამუშაო საათები</li>
-                        <li>დააყენეთ შეზღუდვები (სურვილისამებრ)</li>
-                        <li>დააჭირეთ "განრიგის შექმნა" ღილაკს</li>
-                        <li>განრიგი ავტომატურად დააგეგმავს 4 მედდას დღეში</li>
+                        <li>დაამატეთ მინიმუმ 12-15 მედდა</li>
+                        <li>სისტემა თავად აირჩევს ცვლის საათებს</li>
+                        <li>დააყენეთ შეზღუდვები თითოეული მედდისთვის</li>
+                        <li>დააჭირეთ "განრიგის შექმნა"</li>
+                        <li>სისტემა გექნებათ 4 მედდა ყოველ დღეს</li>
                     </ol>
                 </div>
             </div>
@@ -780,7 +713,7 @@
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: var(--success-color);"></div>
-                            <span>სრულად შევსებული</span>
+                            <span>4/4 მედდა</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: var(--danger-color);"></div>
@@ -793,23 +726,23 @@
     </div>
 
     <div class="footer">
-        <p>მედდის ცვლების განრიგი • თებერვალი 2024 • დაგეგმილია 4 მედდა დღეში</p>
+        <p>ავტომატური მედდის ცვლების განრიგი • თებერვალი 2024 • სისტემა ანიჭებს საათებს</p>
     </div>
 
     <!-- Notification Container -->
     <div class="notification-container" id="notification-container"></div>
 
     <script>
-        class NursingShiftScheduler {
+        class AutomaticNursingShiftScheduler {
             constructor() {
                 this.nurses = [];
                 this.schedule = {};
-                this.selectedHours = 9;
-                this.minRestDays = 4; // Minimum 4 days rest between shifts
-                this.daysInMonth = 29; // February 2024 has 29 days
+                this.daysInMonth = 29; // February 2024
                 this.targetNursesPerDay = 4; // Always 4 nurses per day
+                this.minRestAfter24h = 4; // 4 days rest after 24-hour shift
+                this.minRestOther = 2; // 2 days rest after 9/15-hour shifts
                 
-                // Initialize with sample data if needed
+                // Initialize with sample data
                 this.initSampleData();
                 this.initializeEventListeners();
                 this.generateCalendar();
@@ -818,26 +751,31 @@
             }
             
             initSampleData() {
-                // Add some sample nurses to start with
+                // Add sample nurses (no preferred hours - system will decide)
                 const sampleNurses = [
-                    { name: "ანა ჯანაშია", preferredHours: 9, restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
-                    { name: "ნინო კვარაცხელია", preferredHours: 15, restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
-                    { name: "მარიამ ბერიძე", preferredHours: 24, restrictions: { workEveryNDays: 5, maxDaysPerMonth: 12 } },
-                    { name: "თამარ მეფარიშვილი", preferredHours: 9, restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
-                    { name: "კეთევან გორგაძე", preferredHours: 15, restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
-                    { name: "ლია ციციშვილი", preferredHours: 9, restrictions: { workEveryNDays: 5, maxDaysPerMonth: 12 } },
-                    { name: "სალომე ნადირაძე", preferredHours: 24, restrictions: { workEveryNDays: 6, maxDaysPerMonth: 10 } },
-                    { name: "ნათია ჩხარტიშვილი", preferredHours: 15, restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } }
+                    { name: "ანა ჯანაშია", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "ნინო კვარაცხელია", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "მარიამ ბერიძე", restrictions: { workEveryNDays: 5, maxDaysPerMonth: 12 } },
+                    { name: "თამარ მეფარიშვილი", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "კეთევან გორგაძე", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "ლია ციციშვილი", restrictions: { workEveryNDays: 5, maxDaysPerMonth: 12 } },
+                    { name: "სალომე ნადირაძე", restrictions: { workEveryNDays: 6, maxDaysPerMonth: 10 } },
+                    { name: "ნათია ჩხარტიშვილი", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "მაია ლომაძე", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "ნანა კაპანაძე", restrictions: { workEveryNDays: 5, maxDaysPerMonth: 12 } },
+                    { name: "თეა გელაშვილი", restrictions: { workEveryNDays: 4, maxDaysPerMonth: 15 } },
+                    { name: "ირინა მელაძე", restrictions: { workEveryNDays: 6, maxDaysPerMonth: 10 } }
                 ];
                 
                 sampleNurses.forEach((sample, index) => {
                     const nurse = {
                         id: Date.now() + index,
                         name: sample.name,
-                        preferredHours: sample.preferredHours,
+                        // No preferred hours - system will assign dynamically
                         assignedShifts: 0,
                         totalHours: 0,
                         lastWorkDay: 0,
+                        lastShiftType: null, // '9h', '15h', or '24h'
                         daysWorked: 0,
                         restrictions: {
                             only24HourShifts: false,
@@ -862,19 +800,6 @@
                     if (e.key === 'Enter') this.addNurse();
                 });
                 
-                // Hour selection
-                document.querySelectorAll('.shift-option').forEach(option => {
-                    option.addEventListener('click', (e) => {
-                        document.querySelectorAll('.shift-option').forEach(o => o.classList.remove('selected'));
-                        e.currentTarget.classList.add('selected');
-                        this.selectedHours = parseInt(e.currentTarget.dataset.hours);
-                        
-                        // Show custom input for 24h option
-                        const customInput = document.querySelector('.custom-hours-input');
-                        customInput.style.display = 'none';
-                    });
-                });
-                
                 // Generate schedule
                 document.getElementById('generate-schedule').addEventListener('click', () => this.generateSchedule());
                 
@@ -889,9 +814,6 @@
                 
                 // Load from localStorage on page load
                 window.addEventListener('load', () => this.loadFromLocalStorage());
-                
-                // Initialize hour selection
-                document.querySelector('.shift-option-9h').classList.add('selected');
             }
             
             addNurse() {
@@ -911,10 +833,11 @@
                 const nurse = {
                     id: Date.now(),
                     name: name,
-                    preferredHours: this.selectedHours,
+                    // System will assign hours automatically
                     assignedShifts: 0,
                     totalHours: 0,
                     lastWorkDay: 0,
+                    lastShiftType: null,
                     daysWorked: 0,
                     restrictions: {
                         only24HourShifts: false,
@@ -931,7 +854,7 @@
                 nameInput.value = '';
                 this.updateNurseList();
                 this.updateStatistics();
-                this.showNotification(`მედდა "${name}" დაემატა (${this.selectedHours} საათიანი ცვლა)`, 'success');
+                this.showNotification(`მედდა "${name}" დაემატა (სისტემა თავად აირჩევს საათებს)`, 'success');
             }
             
             updateNurseList() {
@@ -942,7 +865,7 @@
                         <div class="empty-state">
                             <i class="fas fa-user-nurse"></i>
                             <p>მედდები არ არიან დამატებული</p>
-                            <p class="text-muted">დაამატეთ მინიმუმ 8-10 მედდა განრიგის შესაქმნელად</p>
+                            <p class="text-muted">დაამატეთ მინიმუმ 12-15 მედდა განრიგის შესაქმნელად</p>
                         </div>
                     `;
                     return;
@@ -954,22 +877,16 @@
                     const li = document.createElement('li');
                     li.className = 'nurse-item';
                     
-                    // Determine badge class based on hours
-                    let badgeClass = '';
-                    if (nurse.preferredHours === 9) badgeClass = 'badge-9h';
-                    else if (nurse.preferredHours === 15) badgeClass = 'badge-15h';
-                    else if (nurse.preferredHours === 24) badgeClass = 'badge-24h';
-                    
                     // Format restrictions text
                     const restrictionsText = [];
+                    if (nurse.restrictions.only24HourShifts) {
+                        restrictionsText.push('მხოლოდ 24სთ ცვლა');
+                    }
                     if (nurse.restrictions.workEveryNDays) {
                         restrictionsText.push(`ყოველი ${nurse.restrictions.workEveryNDays} დღე`);
                     }
                     if (nurse.restrictions.maxDaysPerMonth) {
                         restrictionsText.push(`მაქს. ${nurse.restrictions.maxDaysPerMonth} დღე`);
-                    }
-                    if (nurse.restrictions.only24HourShifts) {
-                        restrictionsText.push('მხოლოდ 24სთ ცვლა');
                     }
                     
                     li.innerHTML = `
@@ -980,7 +897,7 @@
                         <div class="nurse-header">
                             <div>
                                 <span class="nurse-name">${nurse.name}</span>
-                                <span class="nurse-shift-badge ${badgeClass}">${nurse.preferredHours} სთ</span>
+                                <span class="nurse-shift-badge">სისტემა აირჩევს</span>
                             </div>
                         </div>
                         
@@ -1000,7 +917,7 @@
                             <div class="restriction-item">
                                 <input type="checkbox" id="only24h-${index}" data-index="${index}" data-restriction="only24HourShifts" 
                                     ${nurse.restrictions.only24HourShifts ? 'checked' : ''}>
-                                <label for="only24h-${index}">მხოლოდ 24სთ</label>
+                                <label for="only24h-${index}">მხოლოდ 24სთ ცვლები</label>
                             </div>
                             
                             <div class="restriction-item">
@@ -1072,7 +989,7 @@
                 calendarBody.innerHTML = '';
                 
                 // February 2024 starts on Thursday (4th day of week, 0=Sunday)
-                const startDay = 4; // Thursday
+                const startDay = 4;
                 let currentDay = 1;
                 
                 // Generate 5 weeks (enough for 29 days)
@@ -1103,6 +1020,13 @@
                         // Check if this day is incomplete
                         if (this.schedule[currentDay] && this.schedule[currentDay].nurses.length < 4) {
                             cell.classList.add('incomplete');
+                            // Add alert badge for days with less than 2 nurses
+                            if (this.schedule[currentDay].nurses.length < 2) {
+                                const alertBadge = document.createElement('div');
+                                alertBadge.className = 'alert-badge';
+                                alertBadge.innerHTML = '<i class="fas fa-exclamation"></i>';
+                                cell.appendChild(alertBadge);
+                            }
                         }
                         
                         cell.dataset.day = currentDay;
@@ -1128,8 +1052,8 @@
             }
             
             generateSchedule() {
-                if (this.nurses.length < 8) {
-                    this.showNotification('საკმარისი მედდა არ არის. საჭიროა მინიმუმ 8 მედდა.', 'error');
+                if (this.nurses.length < 12) {
+                    this.showNotification('საკმარისი მედდა არ არის. საჭიროა მინიმუმ 12 მედდა.', 'error');
                     return;
                 }
                 
@@ -1142,10 +1066,13 @@
                     this.scheduleDay(day);
                 }
                 
+                // Fix any days with insufficient nurses
+                this.fixIncompleteDays();
+                
                 // Update display and statistics
                 this.updateScheduleDisplay();
                 this.updateStatistics();
-                this.showNotification('განრიგი წარმატებით შეიქმნა!', 'success');
+                this.showNotification('განრიგი წარმატებით შეიქმნა! სისტემამ თავად აირჩია საათები.', 'success');
             }
             
             scheduleDay(day) {
@@ -1164,17 +1091,13 @@
                 // Find available nurses for this day
                 const availableNurses = this.getAvailableNurses(day);
                 
-                if (availableNurses.length < this.targetNursesPerDay) {
-                    // Not enough nurses available, try to find nurses who can work extra
-                    const extraNurses = this.getNursesWhoCanWorkExtra(day);
-                    availableNurses.push(...extraNurses.slice(0, this.targetNursesPerDay - availableNurses.length));
+                if (availableNurses.length === 0) {
+                    return;
                 }
                 
-                // Sort available nurses by:
-                // 1. Those who need to work based on workEveryNDays restriction
-                // 2. Those with fewer total hours
+                // Sort available nurses by priority
                 availableNurses.sort((a, b) => {
-                    // Check if nurses need to work based on their restrictions
+                    // Priority 1: Nurses who need to work based on workEveryNDays restriction
                     const aNeedsWork = a.restrictions.workEveryNDays && 
                                      (day - a.lastWorkDay >= a.restrictions.workEveryNDays);
                     const bNeedsWork = b.restrictions.workEveryNDays && 
@@ -1183,24 +1106,152 @@
                     if (aNeedsWork && !bNeedsWork) return -1;
                     if (!aNeedsWork && bNeedsWork) return 1;
                     
-                    // Then sort by total hours (to balance workload)
+                    // Priority 2: Nurses with fewer total hours
                     return a.totalHours - b.totalHours;
                 });
                 
-                // Try to assign nurses until we have 4 or run out of available nurses
+                // We need exactly 4 nurses per day
                 let assignedCount = 0;
-                for (const nurse of availableNurses) {
-                    if (assignedCount >= this.targetNursesPerDay) break;
-                    
-                    // Check if nurse can be assigned today
-                    if (this.canAssignNurse(nurse, day)) {
-                        this.assignNurseToDay(nurse, day);
+                let targetHours = 24; // We need to cover 24 hours total
+                
+                // First, check if we need 24-hour nurses (for nurses with only24HourShifts restriction)
+                const twentyFourHourOnlyNurses = availableNurses.filter(n => 
+                    n.restrictions.only24HourShifts && 
+                    this.canWork24HourShift(n, day)
+                );
+                
+                // Assign 24-hour nurses first if available
+                for (const nurse of twentyFourHourOnlyNurses) {
+                    if (assignedCount >= 4) break;
+                    if (this.assignNurseToDay(nurse, day, 24)) {
                         assignedCount++;
+                        targetHours -= 24;
+                        // Remove from available list
+                        availableNurses.splice(availableNurses.indexOf(nurse), 1);
+                    }
+                }
+                
+                // Now assign remaining nurses with flexible hours
+                for (const nurse of availableNurses) {
+                    if (assignedCount >= 4) break;
+                    
+                    // Determine best shift length for this nurse on this day
+                    const shiftHours = this.determineBestShiftHours(nurse, day, targetHours, assignedCount);
+                    
+                    if (shiftHours > 0 && this.canAssignNurse(nurse, day, shiftHours)) {
+                        if (this.assignNurseToDay(nurse, day, shiftHours)) {
+                            assignedCount++;
+                            targetHours -= shiftHours;
+                        }
                     }
                 }
                 
                 // Update day status
-                this.schedule[day].isComplete = assignedCount >= this.targetNursesPerDay;
+                this.schedule[day].isComplete = assignedCount >= 4;
+                
+                // If we still don't have 4 nurses, try to find nurses who can work extra
+                if (assignedCount < 4) {
+                    this.findExtraNursesForDay(day, assignedCount);
+                }
+            }
+            
+            determineBestShiftHours(nurse, day, remainingHours, assignedCount) {
+                // Determine the best shift hours for this nurse
+                
+                // If nurse has only24HourShifts restriction, return 24 if possible
+                if (nurse.restrictions.only24HourShifts && this.canWork24HourShift(nurse, day)) {
+                    return 24;
+                }
+                
+                // Check nurse's last shift type
+                const daysSinceLastShift = nurse.lastWorkDay > 0 ? day - nurse.lastWorkDay : Infinity;
+                
+                // If nurse worked 24h shift recently, they need more rest
+                if (nurse.lastShiftType === '24h' && daysSinceLastShift < this.minRestAfter24h) {
+                    return 0; // Can't work yet
+                }
+                
+                // Check what shift patterns make sense based on remaining hours and assigned nurses
+                const remainingNursesNeeded = 4 - assignedCount;
+                
+                // Ideal patterns:
+                // 1. If we need 1 more nurse and remainingHours is 24, assign 24h
+                // 2. If we need 2 more nurses, try 15+9 or 12+12
+                // 3. If we need 3 more nurses, try 9+9+6 or 8+8+8
+                // 4. If we need 4 more nurses, try 6+6+6+6
+                
+                if (remainingNursesNeeded === 1 && remainingHours === 24) {
+                    // Last nurse needs to cover 24 hours
+                    if (this.canWork24HourShift(nurse, day)) {
+                        return 24;
+                    }
+                } else if (remainingNursesNeeded === 2) {
+                    // Two nurses left, try to assign complementary hours
+                    if (remainingHours === 24) {
+                        // Try 15+9 pattern
+                        if (this.canWorkShift(nurse, day, 15)) return 15;
+                        if (this.canWorkShift(nurse, day, 9)) return 9;
+                    }
+                } else if (remainingNursesNeeded >= 3) {
+                    // Multiple nurses left, assign smaller shifts
+                    if (this.canWorkShift(nurse, day, 9)) return 9;
+                    if (this.canWorkShift(nurse, day, 8)) return 8;
+                    if (this.canWorkShift(nurse, day, 6)) return 6;
+                }
+                
+                // Default to 9-hour shift if nothing else works
+                if (this.canWorkShift(nurse, day, 9)) return 9;
+                
+                return 0;
+            }
+            
+            canWork24HourShift(nurse, day) {
+                // Check if nurse can work a 24-hour shift
+                if (nurse.restrictions.maxHoursPerShift && nurse.restrictions.maxHoursPerShift < 24) {
+                    return false;
+                }
+                
+                // Check if nurse has worked recently
+                if (nurse.lastWorkDay > 0) {
+                    const daysSinceLastWork = day - nurse.lastWorkDay;
+                    // Need at least 4 days rest after previous shift
+                    const minRest = nurse.lastShiftType === '24h' ? this.minRestAfter24h : this.minRestOther;
+                    if (daysSinceLastWork < minRest) {
+                        return false;
+                    }
+                }
+                
+                // Check max days per month
+                if (nurse.restrictions.maxDaysPerMonth && 
+                    nurse.daysWorked >= nurse.restrictions.maxDaysPerMonth) {
+                    return false;
+                }
+                
+                return nurse.availability[day - 1] !== false;
+            }
+            
+            canWorkShift(nurse, day, hours) {
+                // Check if nurse can work a shift of specified hours
+                if (nurse.restrictions.maxHoursPerShift && hours > nurse.restrictions.maxHoursPerShift) {
+                    return false;
+                }
+                
+                // Check if nurse has worked recently
+                if (nurse.lastWorkDay > 0) {
+                    const daysSinceLastWork = day - nurse.lastWorkDay;
+                    // Need at least 2 days rest for non-24h shifts
+                    if (daysSinceLastWork < this.minRestOther) {
+                        return false;
+                    }
+                }
+                
+                // Check max days per month
+                if (nurse.restrictions.maxDaysPerMonth && 
+                    nurse.daysWorked >= nurse.restrictions.maxDaysPerMonth) {
+                    return false;
+                }
+                
+                return nurse.availability[day - 1] !== false;
             }
             
             getAvailableNurses(day) {
@@ -1208,9 +1259,18 @@
                     // Check basic availability
                     if (!nurse.availability[day - 1]) return false;
                     
-                    // Check minimum rest days
-                    if (nurse.lastWorkDay > 0 && (day - nurse.lastWorkDay < this.minRestDays)) {
+                    // Check if already assigned today
+                    if (this.schedule[day] && this.schedule[day].nurses.find(n => n.id === nurse.id)) {
                         return false;
+                    }
+                    
+                    // Check minimum rest days
+                    if (nurse.lastWorkDay > 0) {
+                        const daysSinceLastWork = day - nurse.lastWorkDay;
+                        const minRest = nurse.lastShiftType === '24h' ? this.minRestAfter24h : this.minRestOther;
+                        if (daysSinceLastWork < minRest) {
+                            return false;
+                        }
                     }
                     
                     // Check max days per month restriction
@@ -1232,42 +1292,20 @@
                 });
             }
             
-            getNursesWhoCanWorkExtra(day) {
-                return this.nurses.filter(nurse => {
-                    // Only nurses who can work extra
-                    if (!nurse.canWorkExtra) return false;
-                    
-                    // Check if they're already assigned today
-                    if (this.schedule[day] && this.schedule[day].nurses.find(n => n.id === nurse.id)) {
-                        return false;
-                    }
-                    
-                    // Check if they've worked recently
-                    if (nurse.lastWorkDay > 0 && (day - nurse.lastWorkDay < 2)) {
-                        return false;
-                    }
-                    
-                    // Check max days per month
-                    if (nurse.restrictions.maxDaysPerMonth && 
-                        nurse.daysWorked >= nurse.restrictions.maxDaysPerMonth - 2) {
-                        return false;
-                    }
-                    
-                    return true;
-                }).sort((a, b) => a.totalHours - b.totalHours);
-            }
-            
-            canAssignNurse(nurse, day) {
-                // Check if nurse is already assigned today
+            canAssignNurse(nurse, day, hours) {
+                // Check if nurse can be assigned to this day with these hours
                 if (this.schedule[day] && this.schedule[day].nurses.find(n => n.id === nurse.id)) {
                     return false;
                 }
                 
-                // Check all restrictions
                 if (!nurse.availability[day - 1]) return false;
                 
-                if (nurse.lastWorkDay > 0 && (day - nurse.lastWorkDay < this.minRestDays)) {
-                    return false;
+                if (nurse.lastWorkDay > 0) {
+                    const daysSinceLastWork = day - nurse.lastWorkDay;
+                    const minRest = nurse.lastShiftType === '24h' ? this.minRestAfter24h : this.minRestOther;
+                    if (daysSinceLastWork < minRest) {
+                        return false;
+                    }
                 }
                 
                 if (nurse.restrictions.maxDaysPerMonth && 
@@ -1275,18 +1313,18 @@
                     return false;
                 }
                 
-                // For nurses with workEveryNDays restriction, check if they should work today
-                if (nurse.restrictions.workEveryNDays && nurse.lastWorkDay > 0) {
-                    const daysSinceLastWork = day - nurse.lastWorkDay;
-                    if (daysSinceLastWork < nurse.restrictions.workEveryNDays) {
-                        return false;
-                    }
+                if (hours === 24 && !this.canWork24HourShift(nurse, day)) {
+                    return false;
+                }
+                
+                if (hours < 24 && !this.canWorkShift(nurse, day, hours)) {
+                    return false;
                 }
                 
                 return true;
             }
             
-            assignNurseToDay(nurse, day) {
+            assignNurseToDay(nurse, day, hours) {
                 if (!this.schedule[day]) {
                     this.schedule[day] = {
                         nurses: [],
@@ -1295,23 +1333,167 @@
                     };
                 }
                 
+                // Determine shift type
+                let shiftType = '9h';
+                if (hours === 15) shiftType = '15h';
+                if (hours === 24) shiftType = '24h';
+                
                 // Add nurse to day's schedule
                 this.schedule[day].nurses.push({
                     id: nurse.id,
                     name: nurse.name,
-                    hours: nurse.preferredHours
+                    hours: hours,
+                    shiftType: shiftType
                 });
                 
-                this.schedule[day].totalHours += nurse.preferredHours;
+                this.schedule[day].totalHours += hours;
                 
                 // Update nurse stats
                 nurse.assignedShifts++;
-                nurse.totalHours += nurse.preferredHours;
+                nurse.totalHours += hours;
                 nurse.lastWorkDay = day;
+                nurse.lastShiftType = shiftType;
                 nurse.daysWorked++;
                 
                 // Mark day as complete if we have 4 nurses
                 this.schedule[day].isComplete = this.schedule[day].nurses.length >= this.targetNursesPerDay;
+                
+                return true;
+            }
+            
+            findExtraNursesForDay(day, currentCount) {
+                // Find nurses who can work extra to fill this day
+                const extraNurses = this.nurses.filter(nurse => {
+                    // Only nurses who can work extra
+                    if (!nurse.canWorkExtra) return false;
+                    
+                    // Check if they're already assigned today
+                    if (this.schedule[day] && this.schedule[day].nurses.find(n => n.id === nurse.id)) {
+                        return false;
+                    }
+                    
+                    // Check if they've worked recently (allow with less rest for extra work)
+                    if (nurse.lastWorkDay > 0 && (day - nurse.lastWorkDay < 1)) {
+                        return false;
+                    }
+                    
+                    // Check max days per month (allow 2 extra days)
+                    if (nurse.restrictions.maxDaysPerMonth && 
+                        nurse.daysWorked >= nurse.restrictions.maxDaysPerMonth - 2) {
+                        return false;
+                    }
+                    
+                    return true;
+                }).sort((a, b) => a.totalHours - b.totalHours);
+                
+                // Assign extra nurses
+                for (const nurse of extraNurses) {
+                    if (currentCount >= 4) break;
+                    
+                    // Assign a shorter shift to extra nurses
+                    const shiftHours = 6; // Short shift for extra work
+                    
+                    if (this.canAssignNurse(nurse, day, shiftHours)) {
+                        if (this.assignNurseToDay(nurse, day, shiftHours)) {
+                            currentCount++;
+                        }
+                    }
+                }
+            }
+            
+            fixIncompleteDays() {
+                // Fix days with insufficient nurses (less than 4)
+                for (let day = 1; day <= this.daysInMonth; day++) {
+                    if (!this.schedule[day] || this.schedule[day].nurses.length < 4) {
+                        this.fixDay(day);
+                    }
+                }
+            }
+            
+            fixDay(day) {
+                // Try to fix a specific day that has insufficient nurses
+                const currentNurses = this.schedule[day] ? this.schedule[day].nurses.length : 0;
+                const needed = 4 - currentNurses;
+                
+                if (needed <= 0) return;
+                
+                // Try to find available nurses
+                const availableNurses = this.getAvailableNurses(day);
+                
+                // Sort by total hours (to balance workload)
+                availableNurses.sort((a, b) => a.totalHours - b.totalHours);
+                
+                // Try to assign nurses
+                for (const nurse of availableNurses) {
+                    if (this.schedule[day].nurses.length >= 4) break;
+                    
+                    // Determine appropriate shift hours
+                    let shiftHours = 6; // Default short shift for fixing
+                    
+                    // Check what shift would work best
+                    if (this.schedule[day].totalHours < 12) {
+                        // Need more hours, assign longer shift
+                        shiftHours = this.canWork24HourShift(nurse, day) ? 24 : 
+                                    this.canWorkShift(nurse, day, 15) ? 15 : 9;
+                    } else {
+                        // Just need to fill nurse count, assign shorter shift
+                        shiftHours = this.canWorkShift(nurse, day, 6) ? 6 : 
+                                    this.canWorkShift(nurse, day, 9) ? 9 : 0;
+                    }
+                    
+                    if (shiftHours > 0 && this.canAssignNurse(nurse, day, shiftHours)) {
+                        this.assignNurseToDay(nurse, day, shiftHours);
+                    }
+                }
+                
+                // If still not enough, try to shift nurses from other days
+                if (this.schedule[day].nurses.length < 4) {
+                    this.stealNursesFromOtherDays(day);
+                }
+            }
+            
+            stealNursesFromOtherDays(targetDay) {
+                // Try to move nurses from nearby days to fix this day
+                const daysToCheck = [
+                    targetDay - 1, targetDay - 2, 
+                    targetDay + 1, targetDay + 2
+                ].filter(d => d >= 1 && d <= this.daysInMonth);
+                
+                for (const sourceDay of daysToCheck) {
+                    if (!this.schedule[sourceDay] || this.schedule[sourceDay].nurses.length <= 4) {
+                        continue; // Source day doesn't have extra nurses
+                    }
+                    
+                    // Try to find a nurse from sourceDay that can work on targetDay
+                    for (let i = 0; i < this.schedule[sourceDay].nurses.length; i++) {
+                        const assignment = this.schedule[sourceDay].nurses[i];
+                        const nurse = this.nurses.find(n => n.id === assignment.id);
+                        
+                        if (!nurse) continue;
+                        
+                        // Check if nurse can work on targetDay
+                        if (this.canAssignNurse(nurse, targetDay, assignment.hours)) {
+                            // Move nurse from sourceDay to targetDay
+                            this.schedule[sourceDay].nurses.splice(i, 1);
+                            this.schedule[sourceDay].totalHours -= assignment.hours;
+                            
+                            // Update nurse's lastWorkDay
+                            nurse.lastWorkDay = targetDay;
+                            
+                            // Assign to targetDay
+                            this.assignNurseToDay(nurse, targetDay, assignment.hours);
+                            
+                            // Check if targetDay is now fixed
+                            if (this.schedule[targetDay].nurses.length >= 4) {
+                                return true;
+                            }
+                            
+                            break; // Try another source day
+                        }
+                    }
+                }
+                
+                return false;
             }
             
             resetNurseStats() {
@@ -1319,6 +1501,7 @@
                     nurse.assignedShifts = 0;
                     nurse.totalHours = 0;
                     nurse.lastWorkDay = 0;
+                    nurse.lastShiftType = null;
                     nurse.daysWorked = 0;
                 });
             }
@@ -1340,6 +1523,11 @@
                     // Remove incomplete class initially
                     if (dayCell) {
                         dayCell.classList.remove('incomplete');
+                        // Remove any existing alert badges
+                        const existingBadge = dayCell.querySelector('.alert-badge');
+                        if (existingBadge) {
+                            existingBadge.remove();
+                        }
                     }
                     
                     if (this.schedule[day]) {
@@ -1354,6 +1542,7 @@
                             if (assignment.hours === 9) nurseClass = 'nurse-9h';
                             else if (assignment.hours === 15) nurseClass = 'nurse-15h';
                             else if (assignment.hours === 24) nurseClass = 'nurse-24h';
+                            else nurseClass = 'nurse-9h'; // Default for other hour values
                             
                             nurseDiv.className = `nurse-assignment ${nurseClass}`;
                             nurseDiv.innerHTML = `
@@ -1376,6 +1565,14 @@
                                 // Add incomplete class to cell
                                 if (dayCell) {
                                     dayCell.classList.add('incomplete');
+                                    
+                                    // Add alert badge for days with less than 2 nurses
+                                    if (nurseCount < 2) {
+                                        const alertBadge = document.createElement('div');
+                                        alertBadge.className = 'alert-badge';
+                                        alertBadge.innerHTML = '<i class="fas fa-exclamation"></i>';
+                                        dayCell.appendChild(alertBadge);
+                                    }
                                 }
                             }
                         }
@@ -1387,6 +1584,11 @@
                             // Add incomplete class to cell
                             if (dayCell) {
                                 dayCell.classList.add('incomplete');
+                                // Add alert badge for empty days
+                                const alertBadge = document.createElement('div');
+                                alertBadge.className = 'alert-badge';
+                                alertBadge.innerHTML = '<i class="fas fa-exclamation"></i>';
+                                dayCell.appendChild(alertBadge);
                             }
                         }
                     }
@@ -1430,18 +1632,13 @@
                     return;
                 }
                 
-                // Try to improve the schedule by balancing workload
+                // Try to improve the schedule
                 let improvements = 0;
                 
-                // Find days with too few nurses
-                for (let day = 1; day <= this.daysInMonth; day++) {
-                    if (!this.schedule[day] || this.schedule[day].nurses.length < this.targetNursesPerDay) {
-                        // Try to add more nurses to this day
-                        improvements += this.tryToImproveDay(day);
-                    }
-                }
+                // First, fix any days with less than 4 nurses
+                improvements += this.fixAllIncompleteDays();
                 
-                // Balance workload between nurses
+                // Then balance workload
                 improvements += this.balanceWorkload();
                 
                 // Update display
@@ -1455,31 +1652,18 @@
                 }
             }
             
-            tryToImproveDay(day) {
+            fixAllIncompleteDays() {
                 let improvements = 0;
-                
-                // Check if we can add more nurses to this day
-                const availableNurses = this.getAvailableNurses(day);
-                const currentNurseIds = this.schedule[day] ? 
-                    this.schedule[day].nurses.map(n => n.id) : [];
-                
-                // Find nurses not already assigned today
-                const newNurses = availableNurses.filter(n => 
-                    !currentNurseIds.includes(n.id)
-                );
-                
-                // Try to add nurses until we have 4
-                while (this.schedule[day].nurses.length < this.targetNursesPerDay && newNurses.length > 0) {
-                    // Take the nurse with the least hours
-                    newNurses.sort((a, b) => a.totalHours - b.totalHours);
-                    const nurseToAdd = newNurses.shift();
-                    
-                    if (this.canAssignNurse(nurseToAdd, day)) {
-                        this.assignNurseToDay(nurseToAdd, day);
-                        improvements++;
+                for (let day = 1; day <= this.daysInMonth; day++) {
+                    if (!this.schedule[day] || this.schedule[day].nurses.length < 4) {
+                        const before = this.schedule[day] ? this.schedule[day].nurses.length : 0;
+                        this.fixDay(day);
+                        const after = this.schedule[day] ? this.schedule[day].nurses.length : 0;
+                        if (after > before) {
+                            improvements += (after - before);
+                        }
                     }
                 }
-                
                 return improvements;
             }
             
@@ -1490,38 +1674,41 @@
                 const totalHours = this.nurses.reduce((sum, n) => sum + n.totalHours, 0);
                 const avgHours = totalHours / this.nurses.length;
                 
-                // Find nurses with significantly more or less hours than average
+                // Find nurses with significantly different workloads
                 const overworked = this.nurses.filter(n => n.totalHours > avgHours * 1.3);
                 const underworked = this.nurses.filter(n => n.totalHours < avgHours * 0.7);
                 
-                // Try to shift some work from overworked to underworked nurses
+                // Try to balance
                 for (const over of overworked) {
                     for (const under of underworked) {
-                        // Find a day where over is working and under could work instead
+                        // Find opportunities to shift work
                         for (let day = 1; day <= this.daysInMonth; day++) {
                             if (this.schedule[day] && 
-                                this.schedule[day].nurses.find(n => n.id === over.id) &&
-                                this.canAssignNurse(under, day)) {
+                                this.schedule[day].nurses.find(n => n.id === over.id)) {
                                 
-                                // Check if under is not already working this day
-                                if (!this.schedule[day].nurses.find(n => n.id === under.id)) {
-                                    // Replace over with under on this day
-                                    this.schedule[day].nurses = this.schedule[day].nurses.filter(n => n.id !== over.id);
+                                // Check if under can work this day instead
+                                const assignment = this.schedule[day].nurses.find(n => n.id === over.id);
+                                if (assignment && this.canAssignNurse(under, day, assignment.hours)) {
+                                    // Replace over with under
+                                    const index = this.schedule[day].nurses.findIndex(n => n.id === over.id);
+                                    this.schedule[day].nurses.splice(index, 1);
                                     this.schedule[day].nurses.push({
                                         id: under.id,
                                         name: under.name,
-                                        hours: under.preferredHours
+                                        hours: assignment.hours,
+                                        shiftType: assignment.shiftType
                                     });
                                     
-                                    // Update nurse stats
+                                    // Update stats
                                     over.assignedShifts--;
-                                    over.totalHours -= over.preferredHours;
+                                    over.totalHours -= assignment.hours;
                                     over.daysWorked--;
                                     
                                     under.assignedShifts++;
-                                    under.totalHours += under.preferredHours;
+                                    under.totalHours += assignment.hours;
                                     under.daysWorked++;
                                     under.lastWorkDay = Math.max(under.lastWorkDay, day);
+                                    under.lastShiftType = assignment.shiftType;
                                     
                                     improvements++;
                                     break;
@@ -1539,11 +1726,11 @@
                     nurses: this.nurses,
                     schedule: this.schedule,
                     lastUpdated: new Date().toISOString(),
-                    version: '1.0'
+                    version: '2.0'
                 };
                 
                 try {
-                    localStorage.setItem('nursingSchedule2024', JSON.stringify(data));
+                    localStorage.setItem('automaticNursingSchedule2024', JSON.stringify(data));
                     this.showNotification('განრიგი შენახულია', 'success');
                 } catch (error) {
                     this.showNotification('შენახვა ვერ მოხერხდა', 'error');
@@ -1552,11 +1739,10 @@
             
             loadFromLocalStorage() {
                 try {
-                    const saved = localStorage.getItem('nursingSchedule2024');
+                    const saved = localStorage.getItem('automaticNursingSchedule2024');
                     if (saved) {
                         const data = JSON.parse(saved);
                         
-                        // Validate data structure
                         if (data.nurses && data.schedule) {
                             this.nurses = data.nurses;
                             this.schedule = data.schedule;
@@ -1574,6 +1760,9 @@
                                         unavailableDays: [],
                                         maxHoursPerShift: null
                                     };
+                                }
+                                if (!nurse.lastShiftType) {
+                                    nurse.lastShiftType = null;
                                 }
                             });
                             
@@ -1604,7 +1793,7 @@
                     this.generateCalendar();
                     
                     // Clear localStorage
-                    localStorage.removeItem('nursingSchedule2024');
+                    localStorage.removeItem('automaticNursingSchedule2024');
                     
                     this.showNotification('ყველა მონაცემი გასუფთავდა', 'success');
                 }
@@ -1644,7 +1833,7 @@
         
         // Initialize the scheduler when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            window.scheduler = new NursingShiftScheduler();
+            window.scheduler = new AutomaticNursingShiftScheduler();
         });
     </script>
 </body>
