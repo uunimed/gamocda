@@ -333,12 +333,12 @@ body {
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 16px 24px;
+    padding: 8px 20px;
     border-radius: 80px;
     margin-bottom: 28px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
     width: 100%;
 }
         
@@ -612,6 +612,17 @@ td, th {
             }
         }
         
+        @keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -846,6 +857,28 @@ td, th {
         /* POPUP STYLES */
         /* ============================================ */
         
+        /* Style for duty row cells (non-input) */
+tr:first-child td:not(.type-header) {
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+    height: 50px;
+}
+
+/* Keep green cells but make text readable */
+.shift-cell {
+    background-color: #2b7a4b !important;
+    color: white !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.shift-cell:hover {
+    background-color: #1e5a38 !important;
+    transform: scale(1.02);
+}
+
 .popup-box {
     position: fixed;
     top: 50%;
@@ -1142,14 +1175,13 @@ thead tr:first-child th:first-child {
             <div class="logo-circle">
                 <i class="fas fa-user-md"></i>
             </div>
-            <h1 class="login-title">MediClubGeorgia</h1>
-            <p class="login-subtitle">პროფესიონალური ხელფასის კალკულატორი</p>
+            <h1 class="login-title">Shogi Calculation</h1>
         </div>
         
         <div class="input-group-modern">
             <div class="input-wrapper">
                 <i class="fas fa-user"></i>
-                <input type="text" id="username" class="input-modern" placeholder="მომხმარებლის სახელი" autocomplete="username">
+                <input type="text" id="username" class="input-modern" placeholder="მომხმარებელი" autocomplete="username">
             </div>
         </div>
         
@@ -1161,11 +1193,10 @@ thead tr:first-child th:first-child {
         </div>
         
         <button class="btn-modern" onclick="login()" id="loginBtn">
-            <i class="fas fa-sign-in-alt"></i> სისტემაში შესვლა
+            <i class="fas fa-sign-in-alt"></i> შესვლა
         </button>
         
         <div class="login-footer" style="margin-top: 25px; font-size: 12px; color: #888;">
-            <i class="fas fa-shield-alt"></i> უსაფრთხო შესვლა
         </div>
     </div>
 </div>
@@ -1207,9 +1238,8 @@ thead tr:first-child th:first-child {
         
         <!-- Earning Panel -->
         <div class="earning-panel">
-            <div>📊 მოსალოდნელი გამომუშავება</div>
+            <div>მოსალოდნელი შემოსავალი</div>
             <div class="total-earning" id="totalEarning">0.00 ₾</div>
-            <div class="expected-label">(გამოთვლილი მორიგეობების მიხედვით)</div>
         </div>
         
         <!-- Main Table Container -->
@@ -1223,15 +1253,7 @@ thead tr:first-child th:first-child {
                 </tbody>
             </table>
         </div>
-        
-        <!-- Prices Info Footer -->
-        <div class="prices-info">
-            <div class="price-item"><i class="fas fa-clock"></i> 1 საათი მორიგეობა = 5.84 ₾</div>
-            <div class="price-item"><i class="fas fa-eye"></i> 1 ობსერვაცია = 7 ₾</div>
-            <div class="price-item"><i class="fas fa-tint"></i> 1 ჰემოტრანსფუზია = 5 ₾</div>
-            <div class="price-item"><i class="fas fa-bed"></i> 1 დღის სტაციონარი = 10 ₾</div>
-            <div class="price-item"><i class="fas fa-shield-alt"></i> დაზღვევა = -100 ₾</div>
-            <div class="price-item"><i class="fas fa-dumbbell"></i> Fitpass = -85 ₾</div>
+
         </div>
     </div>
 </div>
@@ -1241,7 +1263,7 @@ thead tr:first-child th:first-child {
 <div class="modal" id="otherMonthsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3><i class="fas fa-calendar-alt"></i> სხვა თვეების მონაცემები</h3>
+            <h3><i class="fas fa-calendar-alt"></i> საერთო მონაცემები</h3>
             <button onclick="closeModal('otherMonthsModal')"><i class="fas fa-times"></i></button>
         </div>
         <div id="globalStats" class="stats-grid"></div>
@@ -1275,8 +1297,7 @@ thead tr:first-child th:first-child {
         </div>
         <div style="margin-bottom: 25px;">
             <label style="display: block; margin-bottom: 8px; font-weight: 700; color: #2d3748;">წელი</label>
-            <input type="number" id="newYear" value="2024" style="width:100%; padding: 14px; border-radius: 40px; border: 2px solid #e2e8f0; font-size: 16px;" min="2020" max="2030">
-        </div>
+<input type="number" id="newYear" value="2026" style="width:100%; padding: 14px; border-radius: 40px; border: 2px solid #e2e8f0; font-size: 16px;" min="2020" max="2030">        </div>
         <button class="enhanced-btn-success enhanced-btn" style="width:100%;" onclick="addNewMonth()">
             <i class="fas fa-check-circle"></i> თვის დამატება
         </button>
@@ -1291,22 +1312,22 @@ thead tr:first-child th:first-child {
             <button onclick="closeModal('addShiftModal')"><i class="fas fa-times"></i></button>
         </div>
         <div id="shiftMonthWarning" class="warning-text">
-            ⚠️ მორიგეობის დამატება შესაძლებელია მხოლოდ მომდევნო თვისთვის
+            მორიგეობის დამატება შესაძლებელია მხოლოდ მომდევნო თვისთვის
         </div>
         
-        <h4 style="margin: 10px 0 5px 0; color: #2d3748;">აირჩიეთ მორიგეობის თარიღები:</h4>
+        <h4 style="margin: 10px 0 5px 0; color: #2d3748;">თარიღები:</h4>
         <div class="dates-grid" id="datesGrid">
             <!-- Dates will be generated here -->
         </div>
         
         <div class="insurance-check">
             <input type="checkbox" id="shiftInsurance">
-            <label>🏥 ამ თვის დაზღვევა (გამოაკლდება 100 ₾)</label>
+            <label>ამ თვის დაზღვევა (100 ₾)</label>
         </div>
         
         <div class="fitpass-check">
             <input type="checkbox" id="fitpassCheckbox">
-            <label>💪 Fitpass (გამოაკლდება 85 ₾)</label>
+            <label>Fitpass (85 ₾)</label>
         </div>
         
         <div style="display: flex; gap: 16px; margin-top: 25px;">
@@ -1383,13 +1404,13 @@ let nextMonthTarget = null;
         popupMessage.textContent = message;
         
         if (type === "error") {
-            popupTitle.textContent = "❌ შეცდომა!";
+            popupTitle.textContent = "შეცდომა!";
             popupTitle.style.color = "#e74c3c";
         } else if (type === "success") {
-            popupTitle.textContent = "✅ წარმატება!";
+            popupTitle.textContent = "წარმატება!";
             popupTitle.style.color = "#27ae60";
         } else {
-            popupTitle.textContent = "ℹ️ ინფორმაცია";
+            popupTitle.textContent = "ინფორმაცია";
             popupTitle.style.color = "#1f6e8c";
         }
         
@@ -1524,6 +1545,158 @@ function updateShiftValue(day, field, value) {
     renderCurrentMonth();
 }
     
+function handleShiftCellClick(year, month, day, currentValue) {
+    const key = getMonthKey(year, month);
+    const hasExistingValue = currentValue > 0;
+    
+    if (!hasExistingValue) {
+        // Empty cell - show choice popup
+        showShiftTypePopup(year, month, day);
+    } else {
+        // Cell has value - ask for confirmation to change
+        showConfirmChangePopup(year, month, day, currentValue);
+    }
+}
+
+function showShiftTypePopup(year, month, day) {
+    // Create modal overlay
+    let overlay = document.getElementById('shiftChoiceOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'shiftChoiceOverlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        overlay.style.backdropFilter = 'blur(5px)';
+        overlay.style.zIndex = '3000';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = `
+        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
+            <h3 style="margin-bottom: 25px; font-size: 24px; color: #1f6e8c;">აირჩიეთ მორიგეობის ტიპი</h3>
+            <button id="choice24hrs" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: 700; font-size: 16px; margin: 10px; cursor: pointer; width: 80%;">24 საათიანი მორიგეობა</button>
+            <button id="choiceOther" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: 700; font-size: 16px; margin: 10px; cursor: pointer; width: 80%;">სხვა</button>
+            <button id="choiceCancel" style="background: #e2e8f0; color: #4a5568; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 600; margin-top: 15px; cursor: pointer; width: 60%;">გაუქმება</button>
+        </div>
+    `;
+    
+    overlay.style.display = 'flex';
+    
+    document.getElementById('choice24hrs').onclick = () => {
+        updateShiftValue(day, 'duty', 24);
+        overlay.style.display = 'none';
+        showPopup('დაემატა 24 საათიანი მორიგეობა', 'success');
+    };
+    
+    document.getElementById('choiceOther').onclick = () => {
+        overlay.style.display = 'none';
+        showCustomHoursInput(year, month, day);
+    };
+    
+    document.getElementById('choiceCancel').onclick = () => {
+        overlay.style.display = 'none';
+    };
+}
+
+function showCustomHoursInput(year, month, day) {
+    let overlay = document.getElementById('customHoursOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'customHoursOverlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        overlay.style.backdropFilter = 'blur(5px)';
+        overlay.style.zIndex = '3000';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = `
+        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
+            <h3 style="margin-bottom: 20px; font-size: 24px; color: #1f6e8c;">შეიყვანეთ საათები</h3>
+            <input type="number" id="customHours" step="0.5" min="0" style="width: 80%; padding: 14px; border-radius: 50px; border: 2px solid #e2e8f0; font-size: 18px; text-align: center; margin-bottom: 20px;" placeholder="საათები">
+            <div>
+                <button id="saveCustomHours" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">შენახვა</button>
+                <button id="cancelCustomHours" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">გაუქმება</button>
+            </div>
+        </div>
+    `;
+    
+    overlay.style.display = 'flex';
+    
+    document.getElementById('saveCustomHours').onclick = () => {
+        const hours = parseFloat(document.getElementById('customHours').value);
+        if (!isNaN(hours) && hours > 0) {
+            updateShiftValue(day, 'duty', hours);
+            overlay.style.display = 'none';
+            showPopup(`დაემატა ${hours} საათი`, 'success');
+        } else {
+            showPopup('გთხოვთ შეიყვანოთ სწორი საათები', 'error');
+        }
+    };
+    
+    document.getElementById('cancelCustomHours').onclick = () => {
+        overlay.style.display = 'none';
+    };
+}
+
+function showConfirmChangePopup(year, month, day, currentValue) {
+    let overlay = document.getElementById('confirmChangeOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'confirmChangeOverlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        overlay.style.backdropFilter = 'blur(5px)';
+        overlay.style.zIndex = '3000';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = `
+        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: #f39c12; margin-bottom: 15px;"></i>
+            <h3 style="margin-bottom: 15px; color: #2d3748;">ნამდვილად გსურთ დროის შეცვლა?</h3>
+            <p style="margin-bottom: 25px; color: #718096;">მიმდინარე მნიშვნელობა: <strong>${currentValue}</strong> საათი</p>
+            <div>
+                <button id="confirmYes" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">დიახ, შეცვლა</button>
+                <button id="confirmNo" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">არა</button>
+            </div>
+        </div>
+    `;
+    
+    overlay.style.display = 'flex';
+    
+    document.getElementById('confirmYes').onclick = () => {
+        overlay.style.display = 'none';
+        // Show custom hours input for changing value
+        showCustomHoursInput(year, month, day);
+    };
+    
+    document.getElementById('confirmNo').onclick = () => {
+        overlay.style.display = 'none';
+    };
+}
+
 function renderCurrentMonth() {
     // If no month is set or invalid, use current date
     if (currentDisplayYear === undefined || currentDisplayMonth === undefined) {
@@ -1548,7 +1721,7 @@ function renderCurrentMonth() {
     
     let firstRow = document.createElement('tr');
     let emptyTh = document.createElement('th');
-    emptyTh.textContent = 'სერვისის ტიპი';
+    emptyTh.textContent = 'ტიპი';
     emptyTh.style.background = '#2c3e50';
     emptyTh.style.color = 'white';
     emptyTh.style.minWidth = '180px';
@@ -1571,7 +1744,7 @@ function renderCurrentMonth() {
     
     // Row definitions
     const rows = [
-        { name: "მორიგეობა (საათი)", field: "duty", step: 0.5 },
+        { name: "მორიგეობა", field: "duty", step: 0.5 },
         { name: "ობსერვაცია", field: "obs", step: 1 },
         { name: "ჰემოტრანსფუზია", field: "trans", step: 1 },
         { name: "დღის სტაციონარი", field: "station", step: 1 }
@@ -1588,52 +1761,57 @@ function renderCurrentMonth() {
             const shift = monthData.shifts[day] || { duty: 0, obs: 0, trans: 0, station: 0 };
             const value = shift[row.field] || 0;
             
-            const hasAnyShift = (shift.duty > 0 || shift.obs > 0 || shift.trans > 0 || shift.station > 0);
-            const cellClass = hasAnyShift ? 'shift-cell' : '';
+            // Only apply green color to the "duty" (მორიგეობა) row when there is a shift marked
+            const isDutyRow = row.field === "duty";
+            const hasShiftOnThisDay = monthData.shifts[day] !== undefined;
+            const shouldBeGreen = isDutyRow && hasShiftOnThisDay;
+            const cellClass = shouldBeGreen ? 'shift-cell' : '';
             
             const td = document.createElement('td');
             td.className = cellClass;
             
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.className = 'table-input';
-            input.value = value === 0 ? '' : value;
-            input.step = row.step;
-            input.min = 0;
-            input.setAttribute('data-day', day);
-            input.setAttribute('data-field', row.field);
+            if (isDutyRow) {
+                // For duty row - display text instead of input
+                td.style.cursor = 'pointer';
+                td.style.textAlign = 'center';
+                td.style.fontWeight = 'bold';
+                td.style.fontSize = '14px';
+                
+                // Display the value or empty
+                const displayValue = value === 0 ? '' : value;
+                td.textContent = displayValue;
+                
+                // Add click handler
+                td.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const currentVal = value;
+                    console.log('Cell clicked for day:', day, 'current value:', currentVal);
+                    handleShiftCellClick(currentDisplayYear, currentDisplayMonth, day, currentVal);
+                });
+            } else {
+                // For other rows - use input field
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'table-input';
+                input.value = value === 0 ? '' : value;
+                input.step = row.step;
+                input.min = 0;
+                input.setAttribute('data-day', day);
+                input.setAttribute('data-field', row.field);
+                
+                input.onchange = function(e) {
+                    updateShiftValue(day, row.field, this.value);
+                };
+                
+                td.appendChild(input);
+            }
             
-            input.onchange = (function(d, f) {
-                return function() { updateShiftValue(d, f, this.value); };
-            })(day, row.field);
-            
-            td.appendChild(input);
             tr.appendChild(td);
         }
         
         tableBody.appendChild(tr);
     });
-    
-    // Add extra row for insurance and fitpass indicators
-    let extrasRow = document.createElement('tr');
-    extrasRow.style.background = '#f8f9fe';
-    let extrasLabel = document.createElement('td');
-    extrasLabel.className = 'type-header';
-    extrasLabel.textContent = '📋 გამოქვითვები';
-    extrasRow.appendChild(extrasLabel);
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const td = document.createElement('td');
-        td.style.fontSize = '12px';
-        td.style.textAlign = 'center';
-        let icons = '';
-        if (monthData.insurance) icons += '🏥 ';
-        if (monthData.fitpass) icons += '💪 ';
-        td.textContent = icons || '—';
-        extrasRow.appendChild(td);
-    }
-    tableBody.appendChild(extrasRow);
-    
+
     // Calculate and display total
     calculateAndDisplayTotal();
 }
@@ -1687,7 +1865,7 @@ function goNextMonth() {
         
         monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
         saveData();
-        showPopup(`✅ დაემატა ახალი თვე: ${georgianMonths[month]} ${year}`, "success");
+        showPopup(`დაემატა ახალი თვე: ${georgianMonths[month]} ${year}`, "success");
         closeModal('addMonthModal');
         
         // Optionally switch to the new month
@@ -1703,66 +1881,69 @@ function goNextMonth() {
         return { year: nextMonthDate.getFullYear(), month: nextMonthDate.getMonth() };
     }
     
-    // ---------- OPEN ADD SHIFT MODAL (NEXT MONTH ONLY) ----------
-    function openAddShiftForNextMonthOnly() {
-        const { year: nextY, month: nextM } = getNextMonthFromNow();
-        const targetKey = getMonthKey(nextY, nextM);
-        
-        // Check if month exists
-        if (!monthlyData[targetKey]) {
-            showPopup(`⚠️ ჯერ არ არსებობს ${georgianMonths[nextM]} ${nextY}. გთხოვთ დაამატოთ თვე პირველად!`, "error");
-            return;
-        }
-        
-        nextMonthTarget = { year: nextY, month: nextM };
-        const monthData = monthlyData[targetKey];
-        const daysInMonth = new Date(nextY, nextM + 1, 0).getDate();
-        
-        // Generate date grid
-        const datesGrid = document.getElementById('datesGrid');
-        datesGrid.innerHTML = '';
-        selectedShiftDays = [];
-        
-        // Get existing shift days
-        const existingShifts = monthData.shifts || {};
-        const existingDays = Object.keys(existingShifts).map(Number);
-        
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateDiv = document.createElement('div');
-            dateDiv.className = 'date-cell-select';
-            dateDiv.textContent = day;
-            
-            if (existingDays.includes(day)) {
-                dateDiv.classList.add('selected');
-                selectedShiftDays.push(day);
-            }
-            
-            dateDiv.onclick = (function(d) {
-                return function() {
-                    if (this.classList.contains('selected')) {
-                        this.classList.remove('selected');
-                        const index = selectedShiftDays.indexOf(d);
-                        if (index > -1) selectedShiftDays.splice(index, 1);
-                    } else {
-                        this.classList.add('selected');
-                        selectedShiftDays.push(d);
-                    }
-                };
-            })(day);
-            
-            datesGrid.appendChild(dateDiv);
-        }
-        
-        // Set checkbox states
-        document.getElementById('shiftInsurance').checked = monthData.insurance || false;
-        document.getElementById('fitpassCheckbox').checked = monthData.fitpass || false;
-        
-        // Update warning message
-        const warningDiv = document.getElementById('shiftMonthWarning');
-        warningDiv.innerHTML = `⚠️ მორიგეობის დამატება შესაძლებელია მხოლოდ მომდევნო თვისთვის: <strong>${georgianMonths[nextM]} ${nextY}</strong>`;
-        
-        document.getElementById('addShiftModal').style.display = 'flex';
+function openAddShiftForNextMonthOnly() {
+    // Use the currently displayed month instead of next month from today
+    const targetYear = currentDisplayYear;
+    const targetMonth = currentDisplayMonth;
+    const targetKey = getMonthKey(targetYear, targetMonth);
+    
+    // Check if month exists
+    if (!monthlyData[targetKey]) {
+        showPopup(`ჯერ არ არსებობს ${georgianMonths[targetMonth]} ${targetYear}. გთხოვთ დაამატოთ თვე პირველად!`, "error");
+        return;
     }
+    
+    nextMonthTarget = { year: targetYear, month: targetMonth };
+    const monthData = monthlyData[targetKey];
+    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+    
+    // Generate date grid
+    const datesGrid = document.getElementById('datesGrid');
+    datesGrid.innerHTML = '';
+    selectedShiftDays = [];
+    
+    // Get existing shift days
+    const existingShifts = monthData.shifts || {};
+    const existingDays = Object.keys(existingShifts).map(Number);
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'date-cell-select';
+        dateDiv.textContent = day;
+        
+        if (existingDays.includes(day)) {
+            dateDiv.classList.add('selected');
+            selectedShiftDays.push(day);
+        }
+        
+        dateDiv.onclick = (function(d) {
+            return function() {
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    const index = selectedShiftDays.indexOf(d);
+                    if (index > -1) selectedShiftDays.splice(index, 1);
+                } else {
+                    this.classList.add('selected');
+                    selectedShiftDays.push(d);
+                }
+            };
+        })(day);
+        
+        datesGrid.appendChild(dateDiv);
+    }
+    
+    // Set checkbox states
+    document.getElementById('shiftInsurance').checked = monthData.insurance || false;
+    document.getElementById('fitpassCheckbox').checked = monthData.fitpass || false;
+    
+    // Update warning message - remove the "only next month" restriction
+    const warningDiv = document.getElementById('shiftMonthWarning');
+    warningDiv.innerHTML = `ამორჩეული თვე: <strong>${georgianMonths[targetMonth]} ${targetYear}</strong>`;
+    warningDiv.style.background = "#e8f0fe";
+    warningDiv.style.color = "#1f6e8c";
+    
+    document.getElementById('addShiftModal').style.display = 'flex';
+}
     
     // ---------- SAVE SELECTED DATES (SHIFTS) ----------
     function saveSelectedDates() {
@@ -1792,7 +1973,7 @@ function goNextMonth() {
         saveData();
         closeModal('addShiftModal');
         
-        showPopup(`✅ ${selectedShiftDays.length} თარიღი დამატებულია. დაზღვევა: ${monthlyData[key].insurance ? "კი" : "არა"}, Fitpass: ${monthlyData[key].fitpass ? "კი" : "არა"}`, "success");
+        showPopup(`${selectedShiftDays.length} თარიღი დამატებულია. დაზღვევა: ${monthlyData[key].insurance ? "კი" : "არა"}, Fitpass: ${monthlyData[key].fitpass ? "კი" : "არა"}`, "success");
         
         // Refresh if currently viewing this month
         if (currentDisplayYear === year && currentDisplayMonth === month) {
@@ -1839,15 +2020,15 @@ function goNextMonth() {
         
         globalStats.innerHTML = `
             <div class="stat-card">
-                <h4>💰 ჩარიცხული სულ</h4>
+                <h4>ჩარიცხული სულ</h4>
                 <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
             </div>
             <div class="stat-card">
-                <h4>📈 მაქს. ჩარიცხული</h4>
+                <h4>მაქს. ჩარიცხული</h4>
                 <div class="value">${maxActual.toFixed(2)} ₾</div>
             </div>
             <div class="stat-card">
-                <h4>📉 მინ. ჩარიცხული</h4>
+                <h4>მინ. ჩარიცხული</h4>
                 <div class="value">${minActual.toFixed(2)} ₾</div>
             </div>
         `;
@@ -1888,9 +2069,9 @@ function goNextMonth() {
                                    onchange="updateActualAmount('${key}', this.value)">
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-top: 10px;">
-                            <span>📊 მოსალოდნელი: <strong>${expected.toFixed(2)} ₾</strong></span>
-                            <span>🏥 ${data.insurance ? 'დაზღვევა კი' : 'დაზღვევა არა'}</span>
-                            <span>💪 ${data.fitpass ? 'Fitpass კი' : 'Fitpass არა'}</span>
+                            <span>მოსალოდნელი: <strong>${expected.toFixed(2)} ₾</strong></span>
+                            <span>${data.insurance ? 'დაზღვევა კი' : 'დაზღვევა არა'}</span>
+                            <span>${data.fitpass ? 'Fitpass კი' : 'Fitpass არა'}</span>
                         </div>
                     </div>
                 `;
@@ -1931,7 +2112,6 @@ function login() {
         renderCurrentMonth();
         
         localStorage.setItem('isLoggedIn', 'true');
-        showPopup(`მოგესალმებით, ${username}!`, "success");
     } else {
         showPopup("არასწორი მომხმარებლის სახელი ან პაროლი!", "error");
         document.getElementById('password').value = '';
@@ -1950,7 +2130,6 @@ function login() {
         localStorage.removeItem('isLoggedIn');
         document.getElementById('username').value = '';
         document.getElementById('password').value = '';
-        showPopup("გამოსვლა წარმატებით დასრულდა", "info");
     }
     
     // ---------- ENTER KEY SUPPORT ----------
