@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>ShogiCalc.</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
     <style>
         
         * {
@@ -1495,8 +1494,7 @@ thead tr:first-child th:first-child {
 
 
 <script>
-  
-  const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyCliSpuGZq4ebc6gQD8cqVgq-xMituHHno",
     authDomain: "salary-90666.firebaseapp.com",
     projectId: "salary-90666",
@@ -1595,6 +1593,7 @@ let nextMonthTarget = null;
 
 function saveData() {
     showLoader(true);
+    // Save to Firebase under user-specific path
     const userRef = database.ref(`users/${USERNAME}/monthlyData`);
     userRef.set(monthlyData)
         .then(() => {
@@ -1605,6 +1604,18 @@ function saveData() {
             showLoader(false);
             showPopup("მონაცემების შენახვა ვერ მოხერხდა!", "error");
         });
+}
+    
+    function refreshData() {
+    showLoader(true);
+    
+    loadData();
+    
+    renderCurrentMonth();
+    
+    showPopup("მონაცემები განახლდა!", "success");
+    
+    setTimeout(() => showLoader(false), 500);
 }
 
     
@@ -2754,7 +2765,7 @@ function checkAutoLogin() {
     if (savedLogin === 'true') {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        loadData(); // This now loads from Firebase
+        loadData();
         
         const today = new Date();
         currentDisplayYear = today.getFullYear();
