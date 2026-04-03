@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>ShogiCalc.</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         
         * {
@@ -1491,6 +1495,20 @@ thead tr:first-child th:first-child {
 
 
 <script>
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyCliSpuGZq4ebc6gQD8cqVgq-xMituHHno",
+    authDomain: "salary-90666.firebaseapp.com",
+    projectId: "salary-90666",
+    storageBucket: "salary-90666.firebasestorage.app",
+    messagingSenderId: "1094602077369",
+    appId: "1:1094602077369:web:cb3eb66c762cd490739768",
+    measurementId: "G-LKVJQESGY7"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
     const USERNAME = "alex";
     const PASSWORD = "2911";
     
@@ -1575,39 +1593,44 @@ let nextMonthTarget = null;
     return null;
 }
 
-    function saveData() {
-        showLoader(true);
-        localStorage.setItem('mediClubDataComplete', JSON.stringify(monthlyData));
-        setTimeout(() => showLoader(false), 300);
-    }
-    
-    function refreshData() {
+function saveData() {
     showLoader(true);
-    
-    loadData();
-    
-    renderCurrentMonth();
-    
-    showPopup("მონაცემები განახლდა!", "success");
-    
-    setTimeout(() => showLoader(false), 500);
+    const userRef = database.ref(`users/${USERNAME}/monthlyData`);
+    userRef.set(monthlyData)
+        .then(() => {
+            setTimeout(() => showLoader(false), 300);
+        })
+        .catch((error) => {
+            console.error("Save error:", error);
+            showLoader(false);
+            showPopup("მონაცემების შენახვა ვერ მოხერხდა!", "error");
+        });
 }
 
     
 function loadData() {
-    const savedData = localStorage.getItem('mediClubDataComplete');
-    if (savedData) {
-        try {
-            monthlyData = JSON.parse(savedData);
-            console.log('Data loaded successfully:', Object.keys(monthlyData).length, 'months');
-        } catch(e) {
-            console.error('Failed to parse saved data:', e);
+    showLoader(true);
+    const userRef = database.ref(`users/${USERNAME}/monthlyData`);
+    userRef.once('value')
+        .then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                monthlyData = data;
+                console.log('Data loaded from Firebase:', Object.keys(monthlyData).length, 'months');
+            } else {
+                console.log('No saved data found in Firebase');
+                monthlyData = {};
+            }
+            showLoader(false);
+            renderCurrentMonth();
+        })
+        .catch((error) => {
+            console.error("Load error:", error);
+            showLoader(false);
             monthlyData = {};
-        }
-    } else {
-        console.log('No saved data found');
-        monthlyData = {};
-    }
+            renderCurrentMonth();
+            showPopup("მონაცემების ჩატვირთვა ვერ მოხერხდა!", "error");
+        });
 }
     
 function getDutyRate(year, month) {
@@ -2685,8 +2708,6 @@ function login() {
         
         document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
         
-        renderCurrentMonth();
-        
         localStorage.setItem('isLoggedIn', 'true');
     } else {
         showPopup("მომხმარებლის სახელი ან პაროლი არასწორია!", "error");
@@ -2699,14 +2720,14 @@ function login() {
     }
 }
     
-    function logout() {
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('mainHeader').style.display = 'none';
-        localStorage.removeItem('isLoggedIn');
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-    }
+function logout() {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    localStorage.removeItem('isLoggedIn');
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    monthlyData = {};
+}
     
     function addEnterKeySupport() {
         const passwordField = document.getElementById('password');
@@ -2733,7 +2754,7 @@ function checkAutoLogin() {
     if (savedLogin === 'true') {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        loadData();
+        loadData(); // This now loads from Firebase
         
         const today = new Date();
         currentDisplayYear = today.getFullYear();
@@ -2741,7 +2762,6 @@ function checkAutoLogin() {
         
         document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
         
-        renderCurrentMonth();
     }
 }
     
