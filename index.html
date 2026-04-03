@@ -1595,12 +1595,22 @@ function calculateAndDisplayTotal() {
     
     let total = 0;
     
+    // Calculate from shifts
     if (data.shifts) {
         Object.values(data.shifts).forEach(shift => {
             total += (shift.duty * HOURLY_RATE);
             total += (shift.obs * OBS_RATE);
             total += (shift.trans * TRANS_RATE);
             total += (shift.station * STATION_RATE);
+        });
+    }
+    
+    // Calculate from extras (obs/trans/station without shift)
+    if (data.extras) {
+        Object.values(data.extras).forEach(extra => {
+            total += (extra.obs * OBS_RATE);
+            total += (extra.trans * TRANS_RATE);
+            total += (extra.station * STATION_RATE);
         });
     }
     
@@ -1703,16 +1713,34 @@ function updateShiftValue(day, field, value) {
         monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
     }
     
-    if (!monthlyData[key].shifts[day]) {
-        monthlyData[key].shifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
-    }
-    
     let numValue = parseFloat(value);
     if (isNaN(numValue)) numValue = 0;
     
-    monthlyData[key].shifts[day][field] = numValue;
-    saveData();
+    // For duty field: always create shift entry
+    if (field === 'duty') {
+        if (!monthlyData[key].shifts[day]) {
+            monthlyData[key].shifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
+        }
+        monthlyData[key].shifts[day][field] = numValue;
+    } 
+    // For non-duty fields: only update if shift exists, otherwise store separately
+    else {
+        if (monthlyData[key].shifts[day]) {
+            // Shift exists, update normally
+            monthlyData[key].shifts[day][field] = numValue;
+        } else {
+            // No shift exists, store these values in a separate "extras" object
+            if (!monthlyData[key].extras) {
+                monthlyData[key].extras = {};
+            }
+            if (!monthlyData[key].extras[day]) {
+                monthlyData[key].extras[day] = { obs: 0, trans: 0, station: 0 };
+            }
+            monthlyData[key].extras[day][field] = numValue;
+        }
+    }
     
+    saveData();
     renderCurrentMonth();
 }
     
@@ -1920,12 +1948,20 @@ function renderCurrentMonth() {
         tr.appendChild(tdLabel);
         
         for (let day = 1; day <= daysInMonth; day++) {
-            const shift = monthData.shifts[day] || { duty: 0, obs: 0, trans: 0, station: 0 };
-            const value = shift[row.field] || 0;
+let value = 0;
+if (row.field === 'duty') {
+    const shift = monthData.shifts[day] || { duty: 0 };
+    value = shift.duty || 0;
+} else {
+    // Check both shifts and extras for obs/trans/station
+    const shift = monthData.shifts[day] || {};
+    const extra = (monthData.extras && monthData.extras[day]) || {};
+    value = (shift[row.field] || extra[row.field] || 0);
+}
             
 const isDutyRow = row.field === "duty";
-const hasDutyOnThisDay = monthData.shifts[day] && monthData.shifts[day].duty > 0;
-const shouldBeGreen = isDutyRow && hasDutyOnThisDay;
+const hasShiftOnThisDay = monthData.shifts[day] !== undefined;
+const shouldBeGreen = isDutyRow && hasShiftOnThisDay;
             const cellClass = shouldBeGreen ? 'shift-cell' : '';
             
             const td = document.createElement('td');
