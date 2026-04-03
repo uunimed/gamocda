@@ -1586,8 +1586,6 @@ function calculateAndDisplayTotal() {
     const key = getMonthKey(currentDisplayYear, currentDisplayMonth);
     const data = monthlyData[key];
     
-    document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
-    
     if (!data) {
         document.getElementById('totalEarning').textContent = '0.00 ₾';
         return;
@@ -1605,7 +1603,7 @@ function calculateAndDisplayTotal() {
         });
     }
     
-    // Calculate from extras (obs/trans/station without shift)
+    // ✅ ADD THIS: Calculate from extras (obs/trans/station without shift)
     if (data.extras) {
         Object.values(data.extras).forEach(extra => {
             total += (extra.obs * OBS_RATE);
@@ -1614,12 +1612,8 @@ function calculateAndDisplayTotal() {
         });
     }
     
-    if (data.insurance) {
-        total -= INSURANCE_DEDUCTION;
-    }
-    if (data.fitpass) {
-        total -= FITPASS_DEDUCTION;
-    }
+    if (data.insurance) total -= INSURANCE_DEDUCTION;
+    if (data.fitpass) total -= FITPASS_DEDUCTION;
     
     document.getElementById('totalEarning').textContent = total.toFixed(2) + ' ₾';
 }
@@ -2179,16 +2173,25 @@ function saveSelectedDates() {
         
         Object.keys(monthlyData).forEach(key => {
             const data = monthlyData[key];
-            let expected = 0;
-            
-            if (data.shifts) {
-                Object.values(data.shifts).forEach(shift => {
-                    expected += (shift.duty * HOURLY_RATE);
-                    expected += (shift.obs * OBS_RATE);
-                    expected += (shift.trans * TRANS_RATE);
-                    expected += (shift.station * STATION_RATE);
-                });
-            }
+let expected = 0;
+
+if (data.shifts) {
+    Object.values(data.shifts).forEach(shift => {
+        expected += (shift.duty * HOURLY_RATE);
+        expected += (shift.obs * OBS_RATE);
+        expected += (shift.trans * TRANS_RATE);
+        expected += (shift.station * STATION_RATE);
+    });
+}
+
+// ✅ ADD THIS:
+if (data.extras) {
+    Object.values(data.extras).forEach(extra => {
+        expected += (extra.obs * OBS_RATE);
+        expected += (extra.trans * TRANS_RATE);
+        expected += (extra.station * STATION_RATE);
+    });
+}
             
             if (data.insurance) expected -= INSURANCE_DEDUCTION;
             if (data.fitpass) expected -= FITPASS_DEDUCTION;
@@ -2228,15 +2231,25 @@ function saveSelectedDates() {
                 const [year, month] = key.split('-').map(Number);
                 const data = monthlyData[key];
                 
-                let expected = 0;
-                if (data.shifts) {
-                    Object.values(data.shifts).forEach(shift => {
-                        expected += (shift.duty * HOURLY_RATE);
-                        expected += (shift.obs * OBS_RATE);
-                        expected += (shift.trans * TRANS_RATE);
-                        expected += (shift.station * STATION_RATE);
-                    });
-                }
+let expected = 0;
+
+if (data.shifts) {
+    Object.values(data.shifts).forEach(shift => {
+        expected += (shift.duty * HOURLY_RATE);
+        expected += (shift.obs * OBS_RATE);
+        expected += (shift.trans * TRANS_RATE);
+        expected += (shift.station * STATION_RATE);
+    });
+}
+
+// ✅ ADD THIS:
+if (data.extras) {
+    Object.values(data.extras).forEach(extra => {
+        expected += (extra.obs * OBS_RATE);
+        expected += (extra.trans * TRANS_RATE);
+        expected += (extra.station * STATION_RATE);
+    });
+}
                 if (data.insurance) expected -= INSURANCE_DEDUCTION;
                 if (data.fitpass) expected -= FITPASS_DEDUCTION;
                 
