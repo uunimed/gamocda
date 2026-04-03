@@ -2206,20 +2206,32 @@ if (data.extras) {
         
         if (minActual === Infinity) minActual = 0;
         
-        globalStats.innerHTML = `
-            <div class="stat-card">
-                <h4>ჩარიცხული სულ</h4>
-                <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
-            </div>
-            <div class="stat-card">
-                <h4>მაქს. ჩარიცხული</h4>
-                <div class="value">${maxActual.toFixed(2)} ₾</div>
-            </div>
-            <div class="stat-card">
-                <h4>მინ. ჩარიცხული</h4>
-                <div class="value">${minActual.toFixed(2)} ₾</div>
-            </div>
-        `;
+let filteredExpected = allExpected.filter(val => val > 0);
+let maxExpected = filteredExpected.length > 0 ? Math.max(...filteredExpected) : 0;
+let minExpected = filteredExpected.length > 0 ? Math.min(...filteredExpected) : 0;
+
+globalStats.innerHTML = `
+    <div class="stat-card">
+        <h4>ჩარიცხული სულ</h4>
+        <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
+    </div>
+    <div class="stat-card">
+        <h4>მაქს. ჩარიცხული</h4>
+        <div class="value">${maxActual.toFixed(2)} ₾</div>
+    </div>
+    <div class="stat-card">
+        <h4>მინ. ჩარიცხული</h4>
+        <div class="value">${minActual.toFixed(2)} ₾</div>
+    </div>
+    <div class="stat-card">
+        <h4>მაქსიმალური მოლოდინი</h4>
+        <div class="value">${maxExpected.toFixed(2)} ₾</div>
+    </div>
+    <div class="stat-card">
+        <h4>მინიმალური მოლოდინი</h4>
+        <div class="value">${minExpected.toFixed(2)} ₾</div>
+    </div>
+`;
         
         const sortedKeys = Object.keys(monthlyData).sort().reverse();
         monthsContainer.innerHTML = '';
