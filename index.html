@@ -1923,9 +1923,9 @@ function renderCurrentMonth() {
             const shift = monthData.shifts[day] || { duty: 0, obs: 0, trans: 0, station: 0 };
             const value = shift[row.field] || 0;
             
-            const isDutyRow = row.field === "duty";
-            const hasShiftOnThisDay = monthData.shifts[day] !== undefined;
-            const shouldBeGreen = isDutyRow && hasShiftOnThisDay;
+const isDutyRow = row.field === "duty";
+const hasDutyOnThisDay = monthData.shifts[day] && monthData.shifts[day].duty > 0;
+const shouldBeGreen = isDutyRow && hasDutyOnThisDay;
             const cellClass = shouldBeGreen ? 'shift-cell' : '';
             
             const td = document.createElement('td');
@@ -2092,37 +2092,44 @@ function openAddShiftForNextMonthOnly() {
     document.getElementById('addShiftModal').style.display = 'flex';
 }
     
-    function saveSelectedDates() {
-        if (!nextMonthTarget) {
-            showPopup("შეცდომა: სამიზნე თვე არ არის განსაზღვრული", "error");
-            return;
-        }
-        
-        const { year, month } = nextMonthTarget;
-        const key = getMonthKey(year, month);
-        
-        if (!monthlyData[key]) {
-            monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
-        }
-        
-        monthlyData[key].insurance = document.getElementById('shiftInsurance').checked;
-        monthlyData[key].fitpass = document.getElementById('fitpassCheckbox').checked;
-        
-        const newShifts = {};
-        selectedShiftDays.forEach(day => {
-            newShifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
-        });
-        monthlyData[key].shifts = newShifts;
-        
-        saveData();
-        closeModal('addShiftModal');
-        
-showPopup(`${selectedShiftDays.length} თარიღი დამატებულია. დაზღვევა: ${monthlyData[key].insurance ? "ჩართულია" : "გათიშულია"}, Fitpass: ${monthlyData[key].fitpass ? "ჩართულია" : "გათიშულია"}`, "success");
-
-        if (currentDisplayYear === year && currentDisplayMonth === month) {
-            renderCurrentMonth();
-        }
+function saveSelectedDates() {
+    if (!nextMonthTarget) {
+        showPopup("შეცდომა: სამიზნე თვე არ არის განსაზღვრული", "error");
+        return;
     }
+    
+    const { year, month } = nextMonthTarget;
+    const key = getMonthKey(year, month);
+    
+    if (!monthlyData[key]) {
+        monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
+    }
+    
+    monthlyData[key].insurance = document.getElementById('shiftInsurance').checked;
+    monthlyData[key].fitpass = document.getElementById('fitpassCheckbox').checked;
+    
+    const existingShifts = monthlyData[key].shifts || {};
+    const newShifts = {};
+    
+    selectedShiftDays.forEach(day => {
+        if (existingShifts[day]) {
+            newShifts[day] = { ...existingShifts[day] };
+        } else {
+            newShifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
+        }
+    });
+    
+    monthlyData[key].shifts = newShifts;
+    
+    saveData();
+    closeModal('addShiftModal');
+    
+    showPopup(`${selectedShiftDays.length} თარიღი დამატებულია. დაზღვევა: ${monthlyData[key].insurance ? "ჩართულია" : "გათიშულია"}, Fitpass: ${monthlyData[key].fitpass ? "ჩართულია" : "გათიშულია"}`, "success");
+
+    if (currentDisplayYear === year && currentDisplayMonth === month) {
+        renderCurrentMonth();
+    }
+}
     
     function showOtherMonthsModal() {
         const monthsContainer = document.getElementById('monthsContainer');
