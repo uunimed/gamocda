@@ -550,6 +550,22 @@ td, th {
     animation: modalSlideIn 0.3s ease-out;
 }
 
+#otherMonthsModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#otherMonthsModal #monthsContainer {
+    overflow-y: auto;
+    max-height: calc(85vh - 250px);
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
+#otherMonthsModal .stats-grid {
+    flex-shrink: 0;
+}
         
         @keyframes modalSlideIn {
             from {
@@ -1459,10 +1475,10 @@ let nextMonthTarget = null;
         popupMessage.textContent = message;
         
         if (type === "error") {
-            popupTitle.textContent = "შეცდომა!";
+            popupTitle.textContent = "შეცდომა";
             popupTitle.style.color = "#e74c3c";
         } else if (type === "success") {
-            popupTitle.textContent = "წარმატება!";
+            popupTitle.textContent = "წარმატემა";
             popupTitle.style.color = "#27ae60";
         } else {
             popupTitle.textContent = "ინფორმაცია";
