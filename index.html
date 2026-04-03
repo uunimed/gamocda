@@ -589,6 +589,36 @@ td, th {
     }
 }
 
+/* Add these styles for the other months modal to stretch top and bottom */
+#otherMonthsModal {
+    align-items: flex-start !important;
+    padding-top: 0.5cm;
+    padding-bottom: 0.5cm;
+    box-sizing: border-box;
+}
+
+#otherMonthsModal .modal-content {
+    height: calc(100vh - 1cm);
+    max-height: calc(100vh - 1cm);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#otherMonthsModal .modal-header {
+    flex-shrink: 0;
+}
+
+#otherMonthsModal #globalStats {
+    flex-shrink: 0;
+}
+
+#otherMonthsModal #monthsContainer {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
         .modal-header {
             display: flex;
             justify-content: space-between;
