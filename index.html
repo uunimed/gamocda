@@ -2161,135 +2161,226 @@ function saveSelectedDates() {
     }
 }
     
-    function showOtherMonthsModal() {
-        const monthsContainer = document.getElementById('monthsContainer');
-        const globalStats = document.getElementById('globalStats');
+function showOtherMonthsModal() {
+    const monthsContainer = document.getElementById('monthsContainer');
+    const globalStats = document.getElementById('globalStats');
+    
+    // Calculate global statistics
+    let totalEarnedAll = 0;
+    let maxActual = 0;
+    let minActual = Infinity;
+    let allExpected = [];
+    
+    Object.keys(monthlyData).forEach(key => {
+        const data = monthlyData[key];
+        let expected = 0;
         
-        // Calculate global statistics
-        let totalEarnedAll = 0;
-        let maxActual = 0;
-        let minActual = Infinity;
-        let allExpected = [];
-        
-        Object.keys(monthlyData).forEach(key => {
-            const data = monthlyData[key];
-let expected = 0;
-
-if (data.shifts) {
-    Object.values(data.shifts).forEach(shift => {
-        expected += (shift.duty * HOURLY_RATE);
-        expected += (shift.obs * OBS_RATE);
-        expected += (shift.trans * TRANS_RATE);
-        expected += (shift.station * STATION_RATE);
-    });
-}
-
-// ✅ ADD THIS:
-if (data.extras) {
-    Object.values(data.extras).forEach(extra => {
-        expected += (extra.obs * OBS_RATE);
-        expected += (extra.trans * TRANS_RATE);
-        expected += (extra.station * STATION_RATE);
-    });
-}
-            
-            if (data.insurance) expected -= INSURANCE_DEDUCTION;
-            if (data.fitpass) expected -= FITPASS_DEDUCTION;
-            allExpected.push(expected);
-            
-            if (data.actualAmount && data.actualAmount > 0) {
-                totalEarnedAll += data.actualAmount;
-                if (data.actualAmount > maxActual) maxActual = data.actualAmount;
-                if (data.actualAmount < minActual) minActual = data.actualAmount;
-            }
-        });
-        
-        if (minActual === Infinity) minActual = 0;
-        
-let filteredExpected = allExpected.filter(val => val > 0);
-let maxExpected = filteredExpected.length > 0 ? Math.max(...filteredExpected) : 0;
-let minExpected = filteredExpected.length > 0 ? Math.min(...filteredExpected) : 0;
-
-globalStats.innerHTML = `
-    <div class="stat-card">
-        <h4>ჩარიცხული სულ</h4>
-        <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
-    </div>
-    <div class="stat-card">
-        <h4>მაქს. ჩარიცხული</h4>
-        <div class="value">${maxActual.toFixed(2)} ₾</div>
-    </div>
-    <div class="stat-card">
-        <h4>მინ. ჩარიცხული</h4>
-        <div class="value">${minActual.toFixed(2)} ₾</div>
-    </div>
-    <div class="stat-card">
-        <h4>მაქსიმალური მოლოდინი</h4>
-        <div class="value">${maxExpected.toFixed(2)} ₾</div>
-    </div>
-    <div class="stat-card">
-        <h4>მინიმალური მოლოდინი</h4>
-        <div class="value">${minExpected.toFixed(2)} ₾</div>
-    </div>
-`;
-        
-        const sortedKeys = Object.keys(monthlyData).sort().reverse();
-        monthsContainer.innerHTML = '';
-        
-        if (sortedKeys.length === 0) {
-            monthsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">მონაცემები არ არის</div>';
-        } else {
-            sortedKeys.forEach(key => {
-                const [year, month] = key.split('-').map(Number);
-                const data = monthlyData[key];
-                
-let expected = 0;
-
-if (data.shifts) {
-    Object.values(data.shifts).forEach(shift => {
-        expected += (shift.duty * HOURLY_RATE);
-        expected += (shift.obs * OBS_RATE);
-        expected += (shift.trans * TRANS_RATE);
-        expected += (shift.station * STATION_RATE);
-    });
-}
-
-// ✅ ADD THIS:
-if (data.extras) {
-    Object.values(data.extras).forEach(extra => {
-        expected += (extra.obs * OBS_RATE);
-        expected += (extra.trans * TRANS_RATE);
-        expected += (extra.station * STATION_RATE);
-    });
-}
-                if (data.insurance) expected -= INSURANCE_DEDUCTION;
-                if (data.fitpass) expected -= FITPASS_DEDUCTION;
-                
-                const card = document.createElement('div');
-                card.className = 'month-card';
-                card.innerHTML = `
-                    <div class="month-card-header">
-                        ${georgianMonths[month]} ${year}
-                    </div>
-                    <div class="month-card-content">
-                        <div style="margin-bottom: 12px;">
-                            <label style="font-weight: 600;">ჩარიცხული თანხა:</label>
-                            <input type="number" class="actual-amount-input" value="${data.actualAmount || 0}" 
-                                   onchange="updateActualAmount('${key}', this.value)">
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
-                            <span>მოსალოდნელი: <strong>${expected.toFixed(2)} ₾</strong></span>
-                            <span>${data.insurance ? 'დაზღვევა ჩართულია' : 'დაზღვევა გათიშულია'}</span>
-                            <span>${data.fitpass ? 'Fitpass ჩართულია' : 'Fitpass გათიშულია'}</span>
-                        </div>
-                    </div>
-                `;
-                monthsContainer.appendChild(card);
+        if (data.shifts) {
+            Object.values(data.shifts).forEach(shift => {
+                expected += (shift.duty * HOURLY_RATE);
+                expected += (shift.obs * OBS_RATE);
+                expected += (shift.trans * TRANS_RATE);
+                expected += (shift.station * STATION_RATE);
             });
         }
         
+        if (data.extras) {
+            Object.values(data.extras).forEach(extra => {
+                expected += (extra.obs * OBS_RATE);
+                expected += (extra.trans * TRANS_RATE);
+                expected += (extra.station * STATION_RATE);
+            });
+        }
+        
+        if (data.insurance) expected -= INSURANCE_DEDUCTION;
+        if (data.fitpass) expected -= FITPASS_DEDUCTION;
+        allExpected.push(expected);
+        
+        if (data.actualAmount && data.actualAmount > 0) {
+            totalEarnedAll += data.actualAmount;
+            if (data.actualAmount > maxActual) maxActual = data.actualAmount;
+            if (data.actualAmount < minActual) minActual = data.actualAmount;
+        }
+    });
+    
+    if (minActual === Infinity) minActual = 0;
+    
+    let filteredExpected = allExpected.filter(val => val > 0);
+    let maxExpected = filteredExpected.length > 0 ? Math.max(...filteredExpected) : 0;
+    let minExpected = filteredExpected.length > 0 ? Math.min(...filteredExpected) : 0;
+    
+    // Display global stats cards
+    globalStats.innerHTML = `
+        <div class="stat-card">
+            <h4>ჩარიცხული სულ</h4>
+            <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
+        </div>
+        <div class="stat-card">
+            <h4>მაქს. ჩარიცხული</h4>
+            <div class="value">${maxActual.toFixed(2)} ₾</div>
+        </div>
+        <div class="stat-card">
+            <h4>მინ. ჩარიცხული</h4>
+            <div class="value">${minActual.toFixed(2)} ₾</div>
+        </div>
+        <div class="stat-card">
+            <h4>მაქსიმალური მოლოდინი</h4>
+            <div class="value">${maxExpected.toFixed(2)} ₾</div>
+        </div>
+        <div class="stat-card">
+            <h4>მინიმალური მოლოდინი</h4>
+            <div class="value">${minExpected.toFixed(2)} ₾</div>
+        </div>
+    `;
+    
+    monthsContainer.innerHTML = '';
+    
+    const sortedKeys = Object.keys(monthlyData).sort().reverse();
+    
+    if (sortedKeys.length === 0) {
+        monthsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">მონაცემები არ არის</div>';
         document.getElementById('otherMonthsModal').style.display = 'flex';
+        return;
     }
+    
+    // Create table for each month
+    sortedKeys.forEach(key => {
+        const [year, month] = key.split('-').map(Number);
+        const data = monthlyData[key];
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Calculate totals
+        let totalDuty = 0;
+        let totalObs = 0;
+        let totalTrans = 0;
+        let totalStation = 0;
+        
+        // Calculate from shifts
+        if (data.shifts) {
+            Object.values(data.shifts).forEach(shift => {
+                totalDuty += (shift.duty || 0);
+                totalObs += (shift.obs || 0);
+                totalTrans += (shift.trans || 0);
+                totalStation += (shift.station || 0);
+            });
+        }
+        
+        // Calculate from extras
+        if (data.extras) {
+            Object.values(data.extras).forEach(extra => {
+                totalObs += (extra.obs || 0);
+                totalTrans += (extra.trans || 0);
+                totalStation += (extra.station || 0);
+            });
+        }
+        
+        // Calculate expected earnings
+        let expected = (totalDuty * HOURLY_RATE) + (totalObs * OBS_RATE) + (totalTrans * TRANS_RATE) + (totalStation * STATION_RATE);
+        if (data.insurance) expected -= INSURANCE_DEDUCTION;
+        if (data.fitpass) expected -= FITPASS_DEDUCTION;
+        
+        const actualAmount = data.actualAmount || 0;
+        
+        // Build the table HTML - NO border between header and content
+        let tableHtml = `
+            <div class="month-card" style="margin-bottom: 30px; overflow: hidden;">
+                <div class="month-card-header" style="background: linear-gradient(135deg, #1f6e8c, #0e4e6b); color: white; border-radius: 0;">
+                    ${georgianMonths[month]} ${year}
+                </div>
+                <div style="overflow-x: auto; padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                        <thead>
+                            <tr>
+                                <th style="background: #2c3e50; color: white; padding: 10px; text-align: left; position: sticky; left: 0; min-width: 180px;">ტიპი</th>
+        `;
+        
+        // Add day columns
+        for (let day = 1; day <= daysInMonth; day++) {
+            tableHtml += `<th style="background: #2c3e50; color: white; padding: 8px; text-align: center; min-width: 50px;">${day}</th>`;
+        }
+        
+        tableHtml += `<th style="background: #2c3e50; color: white; padding: 10px; text-align: center; min-width: 80px;">ჯამი</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        // Row: მორიგეობა
+        tableHtml += `<tr>
+            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">მორიგეობა</td>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            const shiftVal = (data.shifts && data.shifts[day] && data.shifts[day].duty) || 0;
+            const cellStyle = shiftVal > 0 ? 'background-color: #2b7a4b; color: white; font-weight: bold;' : '';
+            tableHtml += `<td style="text-align: center; padding: 8px; ${cellStyle}">${shiftVal > 0 ? shiftVal : '-'}</td>`;
+        }
+        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalDuty} სთ</td>
+        </tr>`;
+        
+        // Row: ობსერვაცია
+        tableHtml += `<tr>
+            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">ობსერვაცია</td>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            let obsVal = 0;
+            if (data.shifts && data.shifts[day]) obsVal += (data.shifts[day].obs || 0);
+            if (data.extras && data.extras[day]) obsVal += (data.extras[day].obs || 0);
+            tableHtml += `<td style="text-align: center; padding: 8px;">${obsVal > 0 ? obsVal : '-'}</td>`;
+        }
+        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalObs}</td>
+        </tr>`;
+        
+        // Row: ჰემოტრანსფუზია
+        tableHtml += `<tr>
+            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">ჰემოტრანსფუზია</td>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            let transVal = 0;
+            if (data.shifts && data.shifts[day]) transVal += (data.shifts[day].trans || 0);
+            if (data.extras && data.extras[day]) transVal += (data.extras[day].trans || 0);
+            tableHtml += `<td style="text-align: center; padding: 8px;">${transVal > 0 ? transVal : '-'}</td>`;
+        }
+        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalTrans}</td>
+        </tr>`;
+        
+        // Row: დღის სტაციონარი
+        tableHtml += `<tr>
+            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">დღის სტაციონარი</td>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            let stationVal = 0;
+            if (data.shifts && data.shifts[day]) stationVal += (data.shifts[day].station || 0);
+            if (data.extras && data.extras[day]) stationVal += (data.extras[day].station || 0);
+            tableHtml += `<td style="text-align: center; padding: 8px;">${stationVal > 0 ? stationVal : '-'}</td>`;
+        }
+        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalStation}</td>
+        </tr>`;
+        
+        tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: 20px 20px 15px 20px; border-top: 1px solid #e2edf2; text-align: right;">
+                    <div style="font-size: 16px; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">მოსალოდნელი:</span>
+                        <span style="color: #27ae60; font-weight: 800; font-size: 18px;">${expected.toFixed(2)} ₾</span>
+                    </div>
+                    <div style="font-size: 16px; margin-bottom: 15px;">
+                        <span style="font-weight: 600;">ჩარიცხული:</span>
+                        <input type="number" class="actual-amount-input" value="${actualAmount}" 
+                               onchange="updateActualAmount('${key}', this.value)" 
+                               style="width: 110px; padding: 6px 12px; border-radius: 20px; border: 1px solid #cbd5e1; text-align: center; font-weight: 600; margin-left: 8px;">
+                        <span style="color: #e74c3c; font-weight: 800; font-size: 18px; margin-left: 5px;">₾</span>
+                    </div>
+                    <div style="display: flex; gap: 20px; justify-content: flex-end; font-size: 13px; color: #4a5568; padding-top: 10px; border-top: 1px dashed #e2edf2;">
+                        <span>${data.insurance ? '✅ დაზღვევა (100 ₾)' : '❌ დაზღვევა'}</span>
+                        <span>${data.fitpass ? '✅ Fitpass (85 ₾)' : '❌ Fitpass'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        monthsContainer.innerHTML += tableHtml;
+    });
+    
+    document.getElementById('otherMonthsModal').style.display = 'flex';
+}
     
     function updateActualAmount(monthKey, amount) {
         if (monthlyData[monthKey]) {
