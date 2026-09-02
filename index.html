@@ -2,2803 +2,1636 @@
 <html lang="ka">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ShogiCalc.</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShogiCalendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --brand-color: #0284c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --input-bg: #f8fafc;
+            --input-focus-bg: #ffffff;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            
+            --prio-1: #dc2626;
+            --prio-2: #ea580c;
+            --prio-3: #ca8a04;
+            --prio-4: #16a34a;
+            --prio-5: #0d9488;
         }
 
-body {
-    background: #f0f2f8;
-    min-height: 100vh;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-}
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
-        
-        .global-loader {
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        /* 3. შესვლის (Login) გვერდის დახვეწილი დიზაინი SVG ვექტორით */
+        #loginScreen {
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #loginScreen.active { display: flex; }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 24px;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: loginCardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes loginCardAppear {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .login-logo-box {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #4f46e5, #0284c7);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
         }
-        
-        .global-loader.active {
-            visibility: visible;
-            opacity: 1;
+        .login-logo-box svg {
+            width: 38px;
+            height: 38px;
+            fill: #ffffff;
         }
-        
-        .loader-circle {
-            width: 70px;
-            height: 70px;
-            border: 6px solid rgba(255, 255, 255, 0.2);
-            border-top: 6px solid #ffffff;
-            border-right: 6px solid #ffffff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-.main-header {
-    padding: 15px 0 10px 0;
-    margin-bottom: 5px;
-    width: 100%;
-}
 
-.main-header h1 {
-    font-size: 1.45rem;
-    font-weight: 800;
-    color: #1f6e8c;
-    line-height: 1.3;
-    margin-bottom: 6px;
-    letter-spacing: -0.3px;
-}
-
-.main-header h1 i {
-    color: #1f6e8c;
-    margin-right: 8px;
-}
-
-.main-header p {
-    font-size: 0.8rem;
-    color: #5a6e7c;
-    margin-top: 5px;
-    opacity: 0.85;
-}
-        
-        .login-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(145deg, #e9eff7 0%, #d4e0ec 100%);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        
-        .login-page::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotateBg 30s linear infinite;
-        }
-        
-        @keyframes rotateBg {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .login-container {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 40px 35px;
-            width: 90%;
-            max-width: 460px;
-            box-shadow: 0 35px 65px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3);
+        .login-title-area {
             text-align: center;
-            position: relative;
-            z-index: 10;
-            animation: slideUpLogin 0.5s ease-out;
-        }
-        
-        @keyframes slideUpLogin {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .logo-container {
-            margin-bottom: 30px;
-        }
-        
-        .logo-circle {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, #1f6e8c, #0e4e6b);
-            border-radius: 50%;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 15px 30px rgba(31, 110, 140, 0.3);
+            flex-direction: column;
+            gap: 6px;
         }
-        
-        .logo-circle i {
-            font-size: 42px;
-            color: white;
-        }
-        
-        .login-title {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1f6e8c, #0e4e6b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 8px;
-        }
-        
-        .login-subtitle {
-            color: #6c7a89;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        
-        .input-group-modern {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .input-wrapper {
-            position: relative;
-            margin-top: 5px;
-        }
-        
-        .input-wrapper i {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #1f6e8c;
-            font-size: 18px;
-            z-index: 2;
-        }
-        
-        .input-modern {
-            width: 100%;
-            padding: 16px 20px 16px 52px;
-            border: 2px solid #e2e8f0;
-            border-radius: 60px;
-            font-size: 1rem;
-            background: white;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-        
-        .input-modern:focus {
-            border-color: #1f6e8c;
-            box-shadow: 0 0 0 4px rgba(31, 110, 140, 0.15);
-            transform: translateY(-1px);
-        }
-        
-        .input-modern::placeholder {
-            color: #a0aec0;
-        }
-        
-        .btn-modern {
-            background: linear-gradient(95deg, #1f6e8c, #0e4e6b);
-            color: white;
-            border: none;
-            padding: 16px 28px;
-            border-radius: 60px;
+        .login-title-area h2 {
+            font-size: 26px;
             font-weight: 700;
-            font-size: 1.05rem;
+            color: #0f172a;
+        }
+        .login-title-area p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .login-form {
             width: 100%;
-            margin-top: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 8px 20px rgba(31, 110, 140, 0.3);
+            flex-direction: column;
+            gap: 16px;
         }
-        
-        .btn-modern:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(31, 110, 140, 0.4);
-        }
-        
-        .btn-modern:active {
-            transform: translateY(0px);
-        }
-        
-        .error-animation {
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
-            20%, 40%, 60%, 80% { transform: translateX(6px); }
-        }
-        
-.main-container {
-    display: none;
-    width: calc(100% - 1cm);
-    margin-left: 0.5cm;
-    margin-right: 0.5cm;
-    max-width: none;
-}
-        
-.logout-btn {
-    position: fixed;
-    top: 20px;
-    right: calc(0.5cm + 10px);
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 14px;
-    z-index: 1000;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 6px 18px rgba(231, 76, 60, 0.3);
-    transition: all 0.3s ease;
-}
-        
-        .logout-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
-        }
-        
-.content {
-    padding: 25px 0;
-    max-width: none;
-    width: 100%;
-    margin: 0;
-}
-        
-.controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 8px 20px;
-    border-radius: 80px;
-    margin-bottom: 28px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    flex-wrap: wrap;
-    gap: 12px;
-    width: 100%;
-}
-        
-        .month-nav {
+        .login-input-group {
             display: flex;
-            align-items: center;
-            gap: 25px;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .login-input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
             background: #f8fafc;
-            padding: 8px 22px;
-            border-radius: 60px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02), 0 2px 5px rgba(0,0,0,0.02);
-        }
-        
-        .nav-arrow {
-            background: white;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #1f6e8c;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
             transition: all 0.2s ease;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+        }
+        .login-input:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 24px -5px rgba(79, 70, 229, 0.5);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .logo-area svg { width: 32px; height: 32px; fill: var(--brand-color); }
+        h1 { font-size: 24px; font-weight: 700; color: var(--brand-color); }
+
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+
+        .daily-alert-banner {
+            background: linear-gradient(135deg, #4f46e5, #0284c7);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
-        
-        .nav-arrow:hover {
-            background: #1f6e8c;
-            color: white;
-            transform: scale(1.08);
-            box-shadow: 0 6px 12px rgba(31, 110, 140, 0.25);
-        }
-        
-        .nav-arrow:active {
-            transform: scale(0.98);
-        }
-        
-        .current-month-display {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #0c4e6e;
-            min-width: 220px;
-            text-align: center;
-            letter-spacing: -0.3px;
-        }
-        
-        .control-buttons {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        
-        .enhanced-control-btn {
-            background: #1f6e8c;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            color: white;
-            font-weight: 700;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 500;
             font-size: 14px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
             cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: none;
+            transition: all 0.2s ease;
         }
-        
-        .enhanced-control-btn-success {
-            background: linear-gradient(135deg, #27ae60, #1e8449);
-        }
-        
-        .enhanced-control-btn-warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
-        
-        .enhanced-control-btn-primary {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-        
-        .enhanced-control-btn:hover {
-            transform: translateY(-3px);
-            filter: brightness(1.05);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-        }
-        
-        .enhanced-control-btn:active {
-            transform: translateY(0px);
-        }
-        
-.earning-panel {
-    background: linear-gradient(135deg, #1f6e8c 0%, #0a5c78 100%);
-    padding: 25px 20px;
-    border-radius: 40px;
-    color: white;
-    text-align: center;
-    margin-bottom: 28px;
-    box-shadow: 0 12px 28px rgba(31, 110, 140, 0.25);
-    width: 100%;
-}
-        
-        .earning-panel div:first-child {
-            font-size: 15px;
-            opacity: 0.9;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        .total-earning {
-            font-size: 3.2rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .expected-label {
-            font-size: 11px;
-            opacity: 0.8;
-            margin-top: 6px;
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-outline { background-color: white; border: 1px solid var(--border-color); color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-outline:hover { background-color: var(--bg-color); border-color: var(--primary); }
+        .btn-danger { background-color: #fee2e2; color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); color: white; }
+        .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+        .calendar-container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-.table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .month-display { font-size: 20px; font-weight: 600; }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
 
-table {
-    min-width: 100%;
-    width: 100%;
-}
-
-td, th {
-    white-space: nowrap;
-    padding: 8px 12px;
-}
-
-.type-header {
-    position: sticky;
-    left: 0;
-    background: #e9f0f5;
-    z-index: 20;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-}
-        
-        .date-header {
-            background: #2c3e50;
-            color: white;
-            font-weight: 700;
-            min-width: 55px;
-        }
-        
-        .shift-cell {
-            background-color: #2b7a4b !important;
-            transition: all 0.15s ease;
-        }
-        
-        .shift-cell input {
-            background-color: #2b7a4b !important;
-            color: white !important;
-            font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        }
-        
-        .shift-cell input:focus {
-            background-color: #1e5a38 !important;
-            border-color: white !important;
-            outline: none;
-        }
-        
-        .table-input {
-            width: 75px;
-            padding: 10px 6px;
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
             text-align: center;
-            border-radius: 20px;
-            border: 1.5px solid #cbd5e1;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-auto-rows: minmax(110px, 1fr);
+            gap: 8px;
+            flex: 1;
+        }
+
+        .day-cell {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .day-cell:hover { border-color: var(--primary); }
+        .day-cell.other-month { opacity: 0.4; }
+
+        .day-number {
             font-weight: 600;
             font-size: 14px;
-            background: white;
-            transition: all 0.2s ease;
-            color: #1e2a3e;
+            align-self: flex-end;
+            color: var(--text-muted);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .table-input:focus {
-            border-color: #1f6e8c;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(31, 110, 140, 0.2);
-            transform: scale(1.02);
+
+        .day-cell.today {
+            animation: pulseCellBg 1.5s infinite ease-in-out;
+            border-color: #f59e0b;
         }
-        
-        .table-input::-webkit-inner-spin-button,
-        .table-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+
+        .day-cell.today .day-number {
+            background: #f59e0b;
+            color: white;
         }
-        
-        .table-input[type="number"] {
-            -moz-appearance: textfield;
-            appearance: textfield;
+
+        @keyframes pulseCellBg {
+            0% { background-color: var(--bg-color); }
+            50% { background-color: #fef3c7; }
+            100% { background-color: var(--bg-color); }
         }
-        
-        .table-input.empty-input {
-            color: #666;
+
+        .event-chip {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
-        .extras-row {
-            background: #f8f9fe;
-            font-size: 12px;
-        }
-        
+
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(5px);
-            z-index: 1500;
-            align-items: center;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2cm;
         }
-        
-.modal-content {
-    background: white;
-    border-radius: 40px;
-    width: calc(100% - 1cm);
-    max-width: calc(100% - 1cm);
-    margin: 0 auto;
-    max-height: 85vh;
-    overflow-y: auto;
-    padding: 30px;
-    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
-    animation: modalSlideIn 0.3s ease-out;
-}
+        .modal.active { display: flex; }
 
-#otherMonthsModal .modal-content {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-#otherMonthsModal #monthsContainer {
-    overflow-y: auto;
-    max-height: calc(85vh - 250px);
-    padding-right: 10px;
-    margin-top: 10px;
-}
-
-#otherMonthsModal .stats-grid {
-    flex-shrink: 0;
-}
-        
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        .modal-content {
+            background: linear-gradient(to bottom, #ffffff, #fcfdff);
+            padding: 36px;
+            border-radius: 20px;
+            width: 100%;
+            max-height: 100%; 
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
-        
-        @keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
 
-#otherMonthsModal {
-    align-items: flex-start !important;
-    padding-top: 0.5cm;
-    padding-bottom: 0.5cm;
-    box-sizing: border-box;
-}
-
-#otherMonthsModal .modal-content {
-    height: calc(100vh - 1cm);
-    max-height: calc(100vh - 1cm);
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-#otherMonthsModal .modal-header {
-    flex-shrink: 0;
-}
-
-#otherMonthsModal #globalStats {
-    flex-shrink: 0;
-}
-
-#otherMonthsModal #monthsContainer {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-}
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eef2f6;
-            padding-bottom: 18px;
-            margin-bottom: 25px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 16px;
         }
-        
-        .modal-header h3 {
-            font-size: 26px;
-            font-weight: 800;
-            color: #1e2a3e;
-        }
-        
-        .modal-header button {
-            background: #f0f2f5;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            color: #666;
-        }
-        
-        .modal-header button:hover {
-            background: #e74c3c;
-            color: white;
-            transform: rotate(90deg);
-        }
-        
-.dates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-    gap: 14px;
-    background: #f9fbfd;
-    padding: 25px;
-    border-radius: 32px;
-    margin: 20px 0;
-    max-height: 320px;
-    overflow-y: auto;
-    width: 100%;
-}
-        
-        .date-cell-select {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 50px;
-            padding: 12px 0;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
+        .modal-header h3 { font-size: 22px; font-weight: 700; color: var(--primary); }
+
+        .close-btn {
+            background: #f1f5f9; border: none; cursor: pointer; color: var(--text-muted);
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s ease;
         }
+        .close-btn:hover { background: #fee2e2; color: var(--danger); transform: scale(1.05); }
+        .close-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; letter-spacing: 0.3px; }
         
-        .date-cell-select:hover {
-            border-color: #1f6e8c;
-            transform: scale(1.05);
-            background: #e6f7ff;
-        }
-        
-        .date-cell-select.selected {
-            background: #2b7a4b;
-            color: white;
-            border-color: #2b7a4b;
-            box-shadow: 0 4px 12px rgba(43, 122, 75, 0.3);
-        }
-        
-        .insurance-check {
-            background: #fff8e7;
-            padding: 14px 22px;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin: 12px 0;
-            border: 1px solid #ffe2b5;
-        }
-        
-        .fitpass-check {
-            background: #e8f0fe;
-            padding: 14px 22px;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin: 12px 0;
-            border: 1px solid #bdd4ff;
-        }
-        
-        .insurance-check label, .fitpass-check label {
-            font-weight: 700;
-            color: #2d3748;
-            cursor: pointer;
-        }
-        
-        .insurance-check input, .fitpass-check input {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        
-        .enhanced-btn {
-            padding: 14px 28px;
-            border-radius: 60px;
-            border: none;
-            font-weight: 800;
-            font-size: 15px;
-            cursor: pointer;
+        .form-control {
+            padding: 12px 16px; 
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px; 
+            font-size: 14px; 
+            color: var(--text-main);
+            outline: none; 
             transition: all 0.25s ease;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .form-control:hover {
+            border-color: #94a3b8;
+            background-color: #ffffff;
+        }
+        .form-control:focus { 
+            border-color: var(--primary); 
+            background-color: var(--input-focus-bg);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .form-control.error {
+            border-color: var(--danger) !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .date-picker-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .date-picker-wrapper input[type="date"] {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .date-picker-wrapper input[type="date"]:hover {
+            border-color: #94a3b8;
+            background-color: #ffffff;
+        }
+        .date-picker-wrapper input[type="date"]:focus {
+            border-color: var(--primary);
+            background-color: var(--input-focus-bg);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .date-picker-wrapper svg {
+            position: absolute;
+            left: 14px;
+            width: 18px;
+            height: 18px;
+            stroke: var(--primary);
+            pointer-events: none;
+        }
+
+        .types-manager-box {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.2s;
+        }
+        .types-manager-box:focus-within {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+        .types-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 130px;
+            overflow-y: auto;
+        }
+        .type-pill {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: all 0.2s;
         }
-        
-        .enhanced-btn-success {
-            background: linear-gradient(135deg, #27ae60, #1e8449);
-            color: white;
+        .type-pill:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
         }
-        
-        .enhanced-btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
+        .type-pill button {
+            background: none; border: none; cursor: pointer; color: var(--text-muted); 
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: color 0.2s;
         }
-        
-        .enhanced-btn-primary {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
+        .type-pill button:hover {
+            color: var(--text-main);
         }
-        
-        .enhanced-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        .type-pill button.del-btn:hover {
+            color: var(--danger);
         }
-        
-        .warning-text {
-            color: #c0392b;
-            font-weight: bold;
-            margin-bottom: 16px;
-            background: #ffe6e6;
-            padding: 14px 18px;
-            border-radius: 40px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .stats-grid {
+
+        .modal-actions {
             display: flex;
-            flex-wrap: wrap;
-            gap: 18px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
-            padding: 16px 18px;
-            border-radius: 28px;
-            flex: 1;
-            min-width: 140px;
-            text-align: center;
-            border: 1px solid #e2edf2;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
-        
-        .stat-card h4 {
-            color: #4a5568;
-            font-size: 13px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .stat-card .value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1f6e8c;
-        }
-        
-        .month-card {
-            background: white;
-            border-radius: 32px;
-            margin-bottom: 18px;
-            border: 1px solid #e2edf2;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-        
-        .month-card:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        }
-        
-        .month-card-header {
-            background: linear-gradient(135deg, #e9f0f5, #dce6ef);
-            padding: 16px 20px;
-            font-weight: 800;
-            font-size: 18px;
-            color: #1e2a3e;
-            border-radius: 32px 32px 0 0;
-        }
-        
-        .month-card-content {
-            padding: 18px;
-        }
-        
-        .actual-amount-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 60px;
-            border: 2px solid #e2e8f0;
-            margin: 8px 0;
-            font-size: 15px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        
-        .actual-amount-input:focus {
-            border-color: #1f6e8c;
-            outline: none;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 2px solid #f1f5f9;
+            padding-top: 20px;
         }
 
-tr:first-child td:not(.type-header) {
-    font-weight: bold;
-    font-size: 14px;
-    text-align: center;
-    vertical-align: middle;
-    height: 50px;
-}
-
-.shift-cell {
-    background-color: #2b7a4b !important;
-    color: white !important;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.shift-cell:hover {
-    background-color: #1e5a38 !important;
-    transform: scale(1.02);
-}
-
-.popup-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 32px 35px;
-    border-radius: 48px;
-    z-index: 2200;
-    width: calc(100% - 1cm);
-    max-width: 500px;
-    text-align: center;
-    display: none;
-    box-shadow: 0 30px 55px rgba(0, 0, 0, 0.3);
-    animation: popupBounce 0.3s ease-out;
-}
-        
-        @keyframes popupBounce {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            80% {
-                transform: translate(-50%, -50%) scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-        
-        .popup-box h3 {
-            margin-bottom: 15px;
-            font-size: 26px;
-            font-weight: 800;
-        }
-        
-        .popup-box p {
-            margin-bottom: 25px;
-            color: #4a5568;
-            font-size: 16px;
-        }
-        
-        .popup-box button {
-            background: linear-gradient(135deg, #1f6e8c, #0e4e6b);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-        }
-        
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 2100;
-            display: none;
-        }
-        
-.prices-info {
-    margin-top: 20px;
-    padding: 16px 24px;
-    background: white;
-    border-radius: 32px;
-    font-size: 13px;
-    color: #4a5568;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    width: 100%;
-}
-        
-        .price-item {
-            display: inline-flex;
+        .details-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .detail-item {
+            background: var(--bg-color);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+        }
+
+        /* 2. სისტემიდან გასვლის უფრო დახვეწილი, ელეგანტური პოპაპი */
+        .custom-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .custom-popup-overlay.active { display: flex; }
+        
+        .custom-popup-box {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+            animation: modernPopupAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes modernPopupAppear {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .popup-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #fee2e2;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-icon-wrapper svg {
+            width: 28px;
+            height: 28px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+        }
+
+        .popup-content-area {
+            display: flex;
+            flex-direction: column;
             gap: 8px;
         }
-        
-        .price-item i {
-            color: #1f6e8c;
+        .popup-content-area h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .popup-content-area p {
             font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-@media (max-width: 850px) {
-    .main-container {
-        width: calc(100% - 0.8cm);
-        margin-left: 0.4cm;
-        margin-right: 0.4cm;
-    }
-    
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-        border-radius: 40px;
-        width: 100%;
-    }
-    
-    .month-nav {
-        justify-content: center;
-    }
-    
-    .control-buttons {
-        justify-content: center;
-    }
-    
-    .current-month-display {
-        font-size: 1.3rem;
-    }
-    
-    .table-input {
-        width: 55px;
-        padding: 6px 3px;
-        font-size: 12px;
-    }
-    
-    .modal-content {
-        width: calc(100% - 0.8cm);
-        max-width: calc(100% - 0.8cm);
-        padding: 20px;
-    }
-    
-    .popup-box {
-        width: calc(100% - 0.8cm);
-    }
-    
-    .logout-btn {
-        right: calc(0.4cm + 10px);
-    }
-    
-    .dates-grid {
-        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
-        gap: 8px;
-        padding: 15px;
-        width: 100%;
-    }
-    
-    .date-cell-select {
-        padding: 8px 0;
-        font-size: 13px;
-    }
-    
-    .total-earning {
-        font-size: 2.2rem;
-    }
-    
-    td, th {
-        padding: 6px 8px;
-    }
-    
-    .content {
-        padding: 20px 0;
-    }
-}
+        .popup-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 4px;
+        }
 
-@media (max-width: 550px) {
-    .main-container {
-        width: calc(100% - 0.6cm);
-        margin-left: 0.3cm;
-        margin-right: 0.3cm;
-    }
-    
-    .content {
-        padding: 15px 0;
-    }
-    
-    .table-input {
-        width: 48px;
-        font-size: 11px;
-    }
-    
-    .modal-content {
-        width: calc(100% - 0.6cm);
-        max-width: calc(100% - 0.6cm);
-        padding: 15px;
-    }
-    
-    .popup-box {
-        width: calc(100% - 0.6cm);
-        padding: 25px 20px;
-    }
-    
-    .logout-btn {
-        right: calc(0.3cm + 10px);
-        padding: 8px 16px;
-        font-size: 12px;
-    }
-    
-    td, th {
-        padding: 4px 6px;
-    }
-    
-    .enhanced-control-btn {
-        padding: 8px 16px;
-        font-size: 12px;
-    }
-    
-    .dates-grid {
-        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-        gap: 6px;
-        padding: 12px;
-    }
-    
-    .date-cell-select {
-        padding: 6px 0;
-        font-size: 12px;
-    }
-}
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast-msg {
+            background: #1e293b;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+            animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .toast-msg.error { background: var(--danger); }
+        .toast-msg.success { background: #16a34a; }
 
+        @keyframes slideInFromRight {
+            0% { transform: translateX(120%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutToRight {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(120%); opacity: 0; }
+        }
 
-@media print {
-    .no-print {
-        display: none !important;
-    }
-    .print-container {
-        margin: 0;
-        padding: 0;
-    }
-    .stat-card {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-    .month-card {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-    table {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-}
-
-.btn-loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1f6e8c;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #0e4e6b;
-}
-        
-.type-header,
-tbody td:first-child {
-    position: sticky !important;
-    left: 0 !important;
-    background: #e9f0f5 !important;
-    z-index: 20 !important;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;
-}
-
-tbody tr td:first-child {
-    background: #e9f0f5;
-    font-weight: 800;
-}
-
-tbody tr td:first-child {
-    background: #e9f0f5 !important;
-    font-weight: 800;
-}
-
-thead tr:first-child th:first-child {
-    position: sticky !important;
-    left: 0 !important;
-    z-index: 30 !important;
-    background: #2c3e50 !important;
-}
-
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    pointer-events: none;
-}
-
-.toast {
-    min-width: 280px;
-    max-width: 380px;
-    background: white;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    transform: translateX(100%);
-    animation: slideIn 0.3s ease forwards;
-    pointer-events: auto;
-    position: relative;
-    overflow: hidden;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideOut {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-
-.toast.success {
-    border-left: 5px solid #27ae60;
-}
-
-.toast.error {
-    border-left: 5px solid #e74c3c;
-}
-
-.toast.info {
-    border-left: 5px solid #1f6e8c;
-}
-
-.toast-icon {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.toast-icon svg {
-    width: 24px;
-    height: 24px;
-}
-
-.toast-content {
-    flex: 1;
-}
-
-.toast-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 4px;
-}
-
-.toast.success .toast-title {
-    color: #27ae60;
-}
-
-.toast.error .toast-title {
-    color: #e74c3c;
-}
-
-.toast.info .toast-title {
-    color: #1f6e8c;
-}
-
-.toast-message {
-    font-size: 13px;
-    color: #4a5568;
-    line-height: 1.4;
-}
-
-.toast-close {
-    flex-shrink: 0;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-    background: none;
-    border: none;
-    padding: 4px;
-}
-
-.toast-close:hover {
-    opacity: 1;
-}
-
-.toast-close svg {
-    width: 16px;
-    height: 16px;
-    fill: #a0aec0;
-}
-
-.toast-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 100%;
-    animation: progress 3s linear forwards;
-}
-
-.toast.success .toast-progress {
-    background: #27ae60;
-}
-
-.toast.error .toast-progress {
-    background: #e74c3c;
-}
-
-.toast.info .toast-progress {
-    background: #1f6e8c;
-}
-
-@keyframes progress {
-    from {
-        width: 100%;
-    }
-    to {
-        width: 0%;
-    }
-}
-
+        #loaderOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
-<div class="global-loader" id="globalLoader">
-    <div class="loader-circle"></div>
-</div>
-
-<div class="login-page" id="loginPage">
-    <div class="login-container">
-        <div class="logo-container">
-            <div class="logo-circle">
-                <i class="fas fa-user-md"></i>
+    <!-- 3. შესვლის (Login) მორგებული გვერდი SVG ვექტორით -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo-box">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/>
+                </svg>
             </div>
-            <h1 class="login-title">Shogi Calculation</h1>
-        </div>
-        
-        <div class="input-group-modern">
-            <div class="input-wrapper">
-                <i class="fas fa-user"></i>
-                <input type="text" id="username" class="input-modern" placeholder="მომხმარებელი" autocomplete="username">
+            <div class="login-title-area">
+                <h2>ShogiCalendar</h2>
+                <p>გთხოვთ გაიაროთ ავტორიზაცია სისტემაში</p>
             </div>
-        </div>
-        
-        <div class="input-group-modern">
-            <div class="input-wrapper">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" class="input-modern" placeholder="პაროლი" autocomplete="current-password">
-            </div>
-        </div>
-        
-        <button class="btn-modern" onclick="login()" id="loginBtn">
-            <i class="fas fa-sign-in-alt"></i> შესვლა
-        </button>
-        
-        <div class="login-footer" style="margin-top: 25px; font-size: 12px; color: #888;">
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="login-input-group">
+                    <label for="loginUser">მომხმარებელი</label>
+                    <input type="text" id="loginUser" class="login-input" placeholder="მაგ: alex" required>
+                </div>
+                <div class="login-input-group">
+                    <label for="loginPass">პაროლი</label>
+                    <input type="password" id="loginPass" class="login-input" placeholder="••••••" required>
+                </div>
+                <button type="submit" class="login-btn">შესვლა</button>
+            </form>
         </div>
     </div>
-</div>
 
-<div class="main-container" id="mainApp">
-    <div class="main-header" id="mainHeader">
-<h1 onclick="refreshData()" style="cursor: pointer;"><i class="fas fa-calculator"></i>ShogiCalc.</h1>
-</div>
-    
-    <button class="logout-btn" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i> გასვლა
-    </button>
-    
-    <div class="content">
-        <div class="controls">
-            <div class="month-nav">
-                <button class="nav-arrow" id="prevMonthBtn" title="წინა თვე">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-<div class="current-month-display" id="currentMonthLabel"></div>
-<button class="nav-arrow" id="nextMonthBtn" title="შემდეგი თვე">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+    <!-- 2. სისტემიდან გასვლის უფრო დახვეწილი ელეგანტური პოპაპი -->
+    <div class="custom-popup-overlay" id="customPopup">
+        <div class="custom-popup-box">
+            <div class="popup-icon-wrapper" id="popupIconBox">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </div>
-            <div class="control-buttons">
-                <button class="enhanced-control-btn enhanced-control-btn-success" onclick="showAddMonthModal()">
-                    <i class="fas fa-plus-circle"></i> ახალი თვე
-                </button>
-                <button class="enhanced-control-btn enhanced-control-btn-warning" onclick="openAddShiftForNextMonthOnly()">
-                    <i class="fas fa-calendar-plus"></i> მორიგეობების დამატება
-                </button>
-                <button class="enhanced-control-btn enhanced-control-btn-primary" onclick="showOtherMonthsModal()">
-                    <i class="fas fa-calendar-alt"></i> ყველა მონაცემი
-                </button>
+            <div class="popup-content-area">
+                <h4 id="customPopupTitle">სისტემიდან გასვლა</h4>
+                <p id="customPopupText">ნამდვილად გსურთ სისტემიდან გასვლა?</p>
+            </div>
+            <div id="customPopupInputContainer" style="display: none; width: 100%;">
+                <input type="text" id="customPopupInput" class="form-control" placeholder="ჩაწერეთ აქ...">
+            </div>
+            <div class="popup-actions-grid" id="popupActionsGrid">
+                <button class="btn btn-outline" id="customPopupCancelBtn" onclick="closeCustomPopup(false)" style="justify-content: center; padding: 12px;">გაუქმება</button>
+                <button class="btn btn-danger" id="customPopupConfirmBtn" onclick="closeCustomPopup(true)" style="justify-content: center; padding: 12px;">გასვლა</button>
             </div>
         </div>
-        
-        <div class="earning-panel">
-            <div>მოსალოდნელი შემოსავალი ამ თვეს</div>
-            <div class="total-earning" id="totalEarning">0.00 ₾</div>
-        </div>
-        
-        <div class="table-container">
-            <table id="mainTable">
-                <thead id="tableHeader">
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
-        </div>
-
-        </div>
     </div>
-</div>
 
-<div class="modal" id="otherMonthsModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-calendar-alt"></i> საერთო მონაცემები</h3>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="printOtherMonths()" style="background: #27ae60; border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#1e8449'" onmouseout="this.style.background='#27ae60'">
-                    <i class="fas fa-print"></i>
-                </button>
-                <button onclick="closeModal('otherMonthsModal')" style="background: #f0f2f5; border: none; color: #666; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#e74c3c'; this.style.color='white'" onmouseout="this.style.background='#f0f2f5'; this.style.color='#666'">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div id="globalStats" class="stats-grid"></div>
-        <div id="monthsContainer"></div>
+    <div id="loaderOverlay">
+        <div class="spinner"></div>
     </div>
-</div>
 
-<div class="modal" id="addMonthModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-calendar-plus"></i> ახალი თვის დამატება</h3>
-            <button onclick="closeModal('addMonthModal')"><i class="fas fa-times"></i></button>
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 700; color: #2d3748;">თვე</label>
-            <select id="newMonth" style="width:100%; padding: 14px; border-radius: 40px; border: 2px solid #e2e8f0; font-size: 16px;">
-                <option value="0">იანვარი</option>
-                <option value="1">თებერვალი</option>
-                <option value="2">მარტი</option>
-                <option value="3">აპრილი</option>
-                <option value="4">მაისი</option>
-                <option value="5">ივნისი</option>
-                <option value="6">ივლისი</option>
-                <option value="7">აგვისტო</option>
-                <option value="8">სექტემბერი</option>
-                <option value="9">ოქტომბერი</option>
-                <option value="10">ნოემბერი</option>
-                <option value="11">დეკემბერი</option>
-            </select>
-        </div>
-        <div style="margin-bottom: 25px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 700; color: #2d3748;">წელი</label>
-<input type="number" id="newYear" value="2026" style="width:100%; padding: 14px; border-radius: 40px; border: 2px solid #e2e8f0; font-size: 16px;" min="2020" max="2030">        </div>
-        <button class="enhanced-btn-success enhanced-btn" style="width:100%;" onclick="addNewMonth()">
-            <i class="fas fa-check-circle"></i> დამატება
-        </button>
-    </div>
-</div>
+    <div id="toastContainer"></div>
 
-<div class="modal" id="addShiftModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-calendar-plus"></i> მორიგეობების დამატება</h3>
-            <button onclick="closeModal('addShiftModal')"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="shiftMonthWarning" class="warning-text">
-            მორიგეობის დამატება შესაძლებელია მხოლოდ შემდეგი თვისთვის
-        </div>
-        
-        <h4 style="margin: 10px 0 5px 0; color: #2d3748;">თარიღები:</h4>
-        <div class="dates-grid" id="datesGrid">
-        </div>
-        
-        <div class="insurance-check">
-            <input type="checkbox" id="shiftInsurance">
-            <label>დაზღვევა (100 ₾)</label>
-        </div>
-        
-        <div class="fitpass-check">
-            <input type="checkbox" id="fitpassCheckbox">
-            <label>Fitpass (85 ₾)</label>
-        </div>
-        
-        <div style="display: flex; gap: 16px; margin-top: 25px;">
-            <button class="enhanced-btn-success enhanced-btn" onclick="saveSelectedDates()" style="flex: 1;">
-                <i class="fas fa-save"></i> შენახვა
-            </button>
-            <button class="enhanced-btn-danger enhanced-btn" onclick="closeModal('addShiftModal')" style="flex: 0.5;">
-                <i class="fas fa-times"></i> გაუქმება
-            </button>
-        </div>
-    </div>
-</div>
-
-<div class="popup-overlay" id="popupOverlay"></div>
-<div class="popup-box" id="popupBox">
-    <h3 id="popupTitle">შეტყობინება</h3>
-    <p id="popupMessage">ეს არის საინფორმაციო შეტყობინება</p>
-    <button onclick="closePopup()">კარგი</button>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
-
-
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyCliSpuGZq4ebc6gQD8cqVgq-xMituHHno",
-    authDomain: "salary-90666.firebaseapp.com",
-    projectId: "salary-90666",
-    storageBucket: "salary-90666.firebasestorage.app",
-    messagingSenderId: "1094602077369",
-    appId: "1:1094602077369:web:cb3eb66c762cd490739768",
-    measurementId: "G-LKVJQESGY7"
-};
-
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-    const USERNAME = "alex";
-    const PASSWORD = "2911";
-    
-    const HOURLY_RATE = 5.84;
-    const OBS_RATE = 7;
-    const TRANS_RATE = 5;
-    const STATION_RATE = 10;
-    const INSURANCE_DEDUCTION = 100;
-    const FITPASS_DEDUCTION = 85;
-    
-const georgianMonths = [
-    "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
-    "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"
-];
-
-let monthlyData = {};
-
-const currentDate = new Date();
-let currentDisplayYear = currentDate.getFullYear();
-let currentDisplayMonth = currentDate.getMonth();
-
-let selectedShiftDays = [];
-let nextMonthTarget = null;
-    
-    function showLoader(show) {
-        const loader = document.getElementById('globalLoader');
-        if (show) {
-            loader.classList.add('active');
-        } else {
-            loader.classList.remove('active');
-        }
-    }
-    
-    function showPopup(message, type = "info") {
-        const popupBox = document.getElementById('popupBox');
-        const popupOverlay = document.getElementById('popupOverlay');
-        const popupTitle = document.getElementById('popupTitle');
-        const popupMessage = document.getElementById('popupMessage');
-        
-        popupMessage.textContent = message;
-        
-        if (type === "error") {
-            popupTitle.textContent = "შეცდომა";
-            popupTitle.style.color = "#e74c3c";
-        } else if (type === "success") {
-            popupTitle.textContent = "წარმატემა";
-            popupTitle.style.color = "#27ae60";
-        } else {
-            popupTitle.textContent = "ინფორმაცია";
-            popupTitle.style.color = "#1f6e8c";
-        }
-        
-        popupOverlay.style.display = 'block';
-        popupBox.style.display = 'block';
-        
-        setTimeout(() => {
-            closePopup();
-        }, 2500);
-    }
-    
-    function closePopup() {
-        document.getElementById('popupOverlay').style.display = 'none';
-        document.getElementById('popupBox').style.display = 'none';
-    }
-    
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-    
-    function getMonthKey(year, month) {
-        return `${year}-${month}`;
-    }
-    
-    
-    function checkSavedData() {
-    const saved = localStorage.getItem('mediClubDataComplete');
-    if (saved) {
-        const data = JSON.parse(saved);
-        console.log('Saved months:', Object.keys(data));
-        return data;
-    }
-    return null;
-}
-
-function saveData() {
-    showLoader(true);
-    // Save to Firebase under user-specific path
-    const userRef = database.ref(`users/${USERNAME}/monthlyData`);
-    userRef.set(monthlyData)
-        .then(() => {
-            setTimeout(() => showLoader(false), 300);
-        })
-        .catch((error) => {
-            console.error("Save error:", error);
-            showLoader(false);
-            showPopup("მონაცემების შენახვა ვერ მოხერხდა!", "error");
-        });
-}
-    
-    function refreshData() {
-    showLoader(true);
-    
-    loadData();
-    
-    renderCurrentMonth();
-    
-    showPopup("მონაცემები განახლდა!", "success");
-    
-    setTimeout(() => showLoader(false), 500);
-}
-
-    
-function loadData() {
-    showLoader(true);
-    const userRef = database.ref(`users/${USERNAME}/monthlyData`);
-    userRef.once('value')
-        .then((snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                monthlyData = data;
-                console.log('Data loaded from Firebase:', Object.keys(monthlyData).length, 'months');
-            } else {
-                console.log('No saved data found in Firebase');
-                monthlyData = {};
-            }
-            showLoader(false);
-            renderCurrentMonth();
-        })
-        .catch((error) => {
-            console.error("Load error:", error);
-            showLoader(false);
-            monthlyData = {};
-            renderCurrentMonth();
-            showPopup("მონაცემების ჩატვირთვა ვერ მოხერხდა!", "error");
-        });
-}
-    
-function getDutyRate(year, month) {
-    if (year > 2025 || (year === 2025 && month >= 4)) {
-        return 5.84;
-    }
-    return 5;
-}
-
-function getObsRate(year, month) {
-    if (year > 2025 || (year === 2025 && month >= 1)) {
-        return 7;
-    }
-    return 5;
-}
-
-function calculateAndDisplayTotal() {
-    const key = getMonthKey(currentDisplayYear, currentDisplayMonth);
-    const data = monthlyData[key];
-    
-    if (!data) {
-        document.getElementById('totalEarning').textContent = '0.00 ₾';
-        return;
-    }
-    
-    let total = 0;
-    
-    const dutyRate = getDutyRate(currentDisplayYear, currentDisplayMonth);
-    const obsRate = getObsRate(currentDisplayYear, currentDisplayMonth);
-    
-    if (data.shifts) {
-        Object.values(data.shifts).forEach(shift => {
-            total += (shift.duty * dutyRate);
-            total += (shift.obs * obsRate);
-            total += (shift.trans * TRANS_RATE);
-            total += (shift.station * STATION_RATE);
-        });
-    }
-    
-    if (data.extras) {
-        Object.values(data.extras).forEach(extra => {
-            total += (extra.obs * obsRate);
-            total += (extra.trans * TRANS_RATE);
-            total += (extra.station * STATION_RATE);
-        });
-    }
-    
-    if (data.insurance) total -= INSURANCE_DEDUCTION;
-    if (data.fitpass) total -= FITPASS_DEDUCTION;
-    
-    document.getElementById('totalEarning').textContent = total.toFixed(2) + ' ₾';
-}
-  
-  function showToast(message, type = "info") {
-    const container = document.getElementById('toastContainer');
-    
-    const icons = {
-        success: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#27ae60"/></svg>`,
-        error: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#e74c3c"/></svg>`,
-        info: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#1f6e8c"/></svg>`
-    };
-    
-    const titles = {
-        success: "წარმატება",
-        error: "შეცდომა",
-        info: "ინფორმაცია"
-    };
-    
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    toast.innerHTML = `
-        <div class="toast-icon">
-            ${icons[type]}
-        </div>
-        <div class="toast-content">
-            <div class="toast-title">${titles[type]}</div>
-            <div class="toast-message">${message}</div>
-        </div>
-        <button class="toast-close">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#a0aec0"/>
+    <header>
+        <!-- 1. ShogiCalendar-ზე დაჭერამ ახორციელებს სრულ განახლებას გვერდის გადატვირთვის გარეშე -->
+        <a class="logo-area" onclick="refreshSystemWithoutReload(); return false;" href="#">
+            <svg viewBox="0 0 24 24">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/>
             </svg>
-        </button>
-        <div class="toast-progress"></div>
-    `;
-    
-    container.appendChild(toast);
-    
-    const timeout = setTimeout(() => {
-        removeToast(toast);
-    }, 3000);
-    
-    const closeBtn = toast.querySelector('.toast-close');
-    closeBtn.addEventListener('click', () => {
-        clearTimeout(timeout);
-        removeToast(toast);
-    });
-    
-    toast.addEventListener('mouseenter', () => {
-        clearTimeout(timeout);
-        const progress = toast.querySelector('.toast-progress');
-        if (progress) {
-            progress.style.animationPlayState = 'paused';
-        }
-    });
-    
-    toast.addEventListener('mouseleave', () => {
-        const newTimeout = setTimeout(() => {
-            removeToast(toast);
-        }, 3000);
-        toast._timeout = newTimeout;
-        const progress = toast.querySelector('.toast-progress');
-        if (progress) {
-            progress.style.animationPlayState = 'running';
-        }
-    });
-}
-
-function removeToast(toast) {
-    toast.style.animation = 'slideOut 0.3s ease forwards';
-    setTimeout(() => {
-        toast.remove();
-    }, 300);
-}
-
-function showPopup(message, type = "info") {
-    showToast(message, type);
-}
-
-function updateShiftValue(day, field, value) {
-    const key = getMonthKey(currentDisplayYear, currentDisplayMonth);
-    
-    if (!monthlyData[key]) {
-        monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
-    }
-    
-    let numValue = parseFloat(value);
-    if (isNaN(numValue)) numValue = 0;
-    
-    if (field === 'duty') {
-        if (!monthlyData[key].shifts[day]) {
-            monthlyData[key].shifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
-        }
-        monthlyData[key].shifts[day][field] = numValue;
-    } 
-    else {
-        if (monthlyData[key].shifts[day]) {
-            monthlyData[key].shifts[day][field] = numValue;
-        } else {
-            if (!monthlyData[key].extras) {
-                monthlyData[key].extras = {};
-            }
-            if (!monthlyData[key].extras[day]) {
-                monthlyData[key].extras[day] = { obs: 0, trans: 0, station: 0 };
-            }
-            monthlyData[key].extras[day][field] = numValue;
-        }
-    }
-    
-    saveData();
-    renderCurrentMonth();
-}
-    
-function handleShiftCellClick(year, month, day, currentValue) {
-    const key = getMonthKey(year, month);
-    const hasExistingValue = currentValue > 0;
-    
-    if (!hasExistingValue) {
-        showShiftTypePopup(year, month, day);
-    } else {
-        showConfirmChangePopup(year, month, day, currentValue);
-    }
-}
-
-function showShiftTypePopup(year, month, day) {
-    let overlay = document.getElementById('shiftChoiceOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'shiftChoiceOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.backdropFilter = 'blur(5px)';
-        overlay.style.zIndex = '3000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
-            <h3 style="margin-bottom: 25px; font-size: 24px; color: #1f6e8c;">ტიპი</h3>
-            <button id="choice24hrs" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: 700; font-size: 16px; margin: 10px; cursor: pointer; width: 80%;">24 საათი</button>
-            <button id="choiceOther" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 15px 25px; border-radius: 50px; font-weight: 700; font-size: 16px; margin: 10px; cursor: pointer; width: 80%;">სხვა</button>
-            <button id="choiceCancel" style="background: #e2e8f0; color: #4a5568; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 600; margin-top: 15px; cursor: pointer; width: 60%;">გაუქმება</button>
+            <h1>ShogiCalendar</h1>
+        </a>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="openEventModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                ღონისძიების დამატება
+            </button>
+            <button class="btn btn-danger" onclick="confirmLogout()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                გასვლა
+            </button>
         </div>
-    `;
-    
-    overlay.style.display = 'flex';
-    
-    document.getElementById('choice24hrs').onclick = () => {
-        updateShiftValue(day, 'duty', 24);
-        overlay.style.display = 'none';
-        showPopup('მორიგეობა დაემატა', 'success');
-    };
-    
-    document.getElementById('choiceOther').onclick = () => {
-        overlay.style.display = 'none';
-        showCustomHoursInput(year, month, day);
-    };
-    
-    document.getElementById('choiceCancel').onclick = () => {
-        overlay.style.display = 'none';
-    };
-}
+    </header>
 
-function showCustomHoursInput(year, month, day) {
-    let overlay = document.getElementById('customHoursOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'customHoursOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.backdropFilter = 'blur(5px)';
-        overlay.style.zIndex = '3000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
-            <h3 style="margin-bottom: 20px; font-size: 24px; color: #1f6e8c;">შეიყვანეთ საათი</h3>
-            <input type="number" id="customHours" step="0.5" min="0" style="width: 80%; padding: 14px; border-radius: 50px; border: 2px solid #e2e8f0; font-size: 18px; text-align: center; margin-bottom: 20px;" placeholder="საათი">
-            <div>
-                <button id="saveCustomHours" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">შენახვა</button>
-                <button id="cancelCustomHours" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">გაუქმება</button>
+    <div class="daily-alert-banner" id="dailyAlertBanner">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span id="alertText">იტვირთება განრიგი...</span>
+    </div>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="month-display" id="monthDisplay"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" onclick="changeMonth(-1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="btn btn-outline" onclick="changeMonth(1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
             </div>
         </div>
-    `;
-    
-    overlay.style.display = 'flex';
-    
-    document.getElementById('saveCustomHours').onclick = () => {
-        const hours = parseFloat(document.getElementById('customHours').value);
-        if (!isNaN(hours) && hours > 0) {
-            updateShiftValue(day, 'duty', hours);
-            overlay.style.display = 'none';
-            showPopup(`დაემატა ${hours} საათი`, 'success');
-        } else {
-            showPopup('გთხოვთ შეიყვანოთ სწორი საათი', 'error');
-        }
-    };
-    
-    document.getElementById('cancelCustomHours').onclick = () => {
-        overlay.style.display = 'none';
-    };
-}
 
-function showConfirmChangePopup(year, month, day, currentValue) {
-    let overlay = document.getElementById('confirmChangeOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'confirmChangeOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.backdropFilter = 'blur(5px)';
-        overlay.style.zIndex = '3000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: #f39c12; margin-bottom: 15px;"></i>
-            <h3 style="margin-bottom: 15px; color: #2d3748;">ნამდვილად გსურთ დროის შეცვლა?</h3>
-            <p style="margin-bottom: 25px; color: #718096;">მიმდინარე მნიშვნელობა: <strong>${currentValue}</strong> საათი</p>
-            <div>
-                <button id="confirmYes" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">შეცვლა</button>
-                <button id="confirmNo" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">გაუქმება</button>
+        <div class="weekdays">
+            <div>ორშ</div><div>სამ</div><div>ოთხ</div><div>ხუთ</div><div>პარ</div><div>შაბ</div><div>კვ</div>
+        </div>
+
+        <div class="days-grid" id="daysGrid"></div>
+    </div>
+
+    <!-- ღონისძიების დამატება/რედაქტირების Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">ღონისძიების დამატება</h3>
+                <button class="close-btn" onclick="closeEventModal()">
+                    <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="eventTitle">სათაური</label>
+                    <input type="text" id="eventTitle" class="form-control required-field" placeholder="მაგ: ტესტი" onblur="validateField(this)">
+                </div>
+
+                <div class="form-group">
+                    <label for="eventStartDate">დაწყების თარიღი</label>
+                    <div class="date-picker-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <input type="date" id="eventStartDate" class="required-field" onblur="validateField(this)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventEndDate">დასრულების თარიღი (არასავალდებულო)</label>
+                    <div class="date-picker-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <input type="date" id="eventEndDate" onblur="validateField(this)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">დაწყების დრო</label>
+                    <input type="text" id="startTime" class="form-control" placeholder="მაგ: 09:00" maxlength="5" oninput="autoFormatStartTime(this)">
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">დასრულების დრო</label>
+                    <input type="text" id="endTime" class="form-control" placeholder="მაგ: 12:00" maxlength="5" oninput="autoFormatEndTime(this)" onblur="validateEndTime(this)">
+                </div>
+
+                <div class="form-group">
+                    <label for="eventPriority">მნიშვნელობა</label>
+                    <select id="eventPriority" class="form-control">
+                        <option value="1">ძალიან მნიშვნელოვანი (წითელი)</option>
+                        <option value="2">მნიშვნელოვანი (ნარინჯისფერი)</option>
+                        <option value="3" selected>სტანდარტული (ყვითელი)</option>
+                        <option value="4">ნაკლებად მნიშვნელოვანი (ღია მწვანე)</option>
+                        <option value="5">უმნიშვნელო (მწვანე)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventType">ტიპი</label>
+                    <select id="eventType" class="form-control"></select>
+                </div>
+
+                <div class="form-group full">
+                    <label>ტიპების მართვა</label>
+                    <div class="types-manager-box">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="newTypeName" class="form-control" placeholder="ახალი ტიპის სახელი..." style="flex:1; background: #ffffff;">
+                            <button class="btn btn-primary" onclick="addNewType()" style="padding: 0 20px;">დამატება</button>
+                        </div>
+                        <div class="types-chips-container" id="typesManageList"></div>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label for="eventDesc">აღწერა</label>
+                    <textarea id="eventDesc" class="form-control" rows="3" placeholder="დეტალური აღწერა..."></textarea>
+                </div>
+            </div>
+
+            <input type="hidden" id="eventId">
+            
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="deleteEventBtn" style="display: none;" onclick="deleteEntireEventPrompt()">მთლიანი ღონისძიების წაშლა</button>
+                <button class="btn btn-outline" onclick="closeEventModal()">გაუქმება</button>
+                <button class="btn btn-primary" onclick="saveEvent()">შენახვა</button>
             </div>
         </div>
-    `;
-    
-    overlay.style.display = 'flex';
-    
-    document.getElementById('confirmYes').onclick = () => {
-        overlay.style.display = 'none';
-        showCustomHoursInput(year, month, day);
-    };
-    
-    document.getElementById('confirmNo').onclick = () => {
-        overlay.style.display = 'none';
-    };
-}
+    </div>
 
-function printOtherMonths() {
-    const globalStats = document.getElementById('globalStats').cloneNode(true);
-    const monthsContainer = document.getElementById('monthsContainer').cloneNode(true);
-    
-    const printContainer = document.createElement('div');
-    printContainer.className = 'print-container';
-    
-    const title = document.createElement('h1');
-    title.textContent = 'MediClubGeorgia-ში სტაციონარში ექთნის გამომუშავებული ხელფასი';
-    title.style.cssText = 'text-align: center; font-size: 24px; margin-bottom: 20px; color: #1f6e8c; font-weight: 800;';
-    printContainer.appendChild(title);
-    
-    const statsWrapper = document.createElement('div');
-    statsWrapper.appendChild(globalStats);
-    statsWrapper.style.cssText = 'margin-bottom: 30px;';
-    
-    const statCards = statsWrapper.querySelectorAll('.stat-card');
-    statCards.forEach(card => {
-        card.style.cssText = 'background: #f8fafc; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #ddd;';
-    });
-    
-    printContainer.appendChild(statsWrapper);
-    
-    const monthsWrapper = document.createElement('div');
-    monthsWrapper.appendChild(monthsContainer);
-    
-    const tables = monthsWrapper.querySelectorAll('table');
-    tables.forEach(table => {
-        table.style.cssText = 'width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px;';
-        
-        const headers = table.querySelectorAll('th');
-        headers.forEach(th => {
-            th.style.cssText = 'background: #2c3e50; color: white; padding: 8px; border: 1px solid #ddd; text-align: center;';
+    <!-- დღის დეტალური ინფორმაციის Modal -->
+    <div class="modal" id="dayDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="dayDetailsTitle">დღის ღონისძიებები</h3>
+                <button class="close-btn" onclick="closeDayDetailsModal()">
+                    <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="details-list" id="dayDetailsList"></div>
+        </div>
+    </div>
+
+    <!-- ღონისძიების წაშლის კონტროლის Popup -->
+    <div class="modal" id="deleteOptionsModal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3>ღონისძიების წაშლა</h3>
+                <button class="close-btn" onclick="closeDeleteOptionsModal()">
+                    <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;" id="deleteOptionsBody">
+                <p id="deleteModalEventTitle" style="font-weight: 600; font-size: 15px; color: var(--primary);"></p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(1)">მხოლოდ ამ დღის წაშლა</button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(2)">ამ და მომდევნო ყველა დღის წაშლა</button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(3)">კონკრეტული დღეების ამორჩევა და წაშლა</button>
+                    <button class="btn btn-danger" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(4)">მთლიანი ღონისძიების წაშლა</button>
+                </div>
+            </div>
+            <div id="customDeleteContainer" style="display: none; flex-direction: column; gap: 12px; margin-top: 10px;">
+                <div style="font-size: 13px; color: var(--text-muted);">მონიშნეთ ის დღეები, რომელთა წაშლაც გსურთ:</div>
+                <div id="customDeleteDaysList" style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                    <button class="btn btn-outline btn-sm" onclick="backToDeleteOptionsMain()">უკან</button>
+                    <button class="btn btn-danger btn-sm" onclick="confirmCustomDelete()">არჩეულის წაშლა</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let events = JSON.parse(localStorage.getItem('shogi_events')) || {};
+        let eventTypes = JSON.parse(localStorage.getItem('shogi_types')) || ["სამსახური", "სწავლა", "პირადი"];
+
+        let currentActiveDayForKey = null;
+        let activeDeleteEventId = null;
+        let activeDeleteDateKey = null;
+
+        // ავტორიზაციის შემოწმება ჩატვირთვისას
+        window.addEventListener('DOMContentLoaded', () => {
+            const isAuth = sessionStorage.getItem('shogi_auth');
+            if (isAuth !== 'true') {
+                document.getElementById('loginScreen').classList.add('active');
+            }
         });
-        
-        const cells = table.querySelectorAll('td');
-        cells.forEach(td => {
-            td.style.cssText = 'padding: 6px; border: 1px solid #ddd; text-align: center;';
-        });
-        
-        const firstCols = table.querySelectorAll('td:first-child');
-        firstCols.forEach(col => {
-            col.style.cssText = 'background: #e9f0f5; font-weight: 800; padding: 6px; border: 1px solid #ddd; text-align: left; position: sticky; left: 0;';
-        });
-    });
-    
-    const monthCards = monthsWrapper.querySelectorAll('.month-card');
-    monthCards.forEach(card => {
-        card.style.cssText = 'margin-bottom: 30px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; page-break-inside: avoid;';
-        
-        const headers = card.querySelectorAll('.month-card-header');
-        headers.forEach(header => {
-            header.style.cssText = 'background: linear-gradient(135deg, #1f6e8c, #0e4e6b); color: white; padding: 12px; font-weight: 800; font-size: 16px;';
-        });
-        
-        const deleteBtns = card.querySelectorAll('button');
-        deleteBtns.forEach(btn => {
-            btn.style.display = 'none';
-        });
-    });
-    
-    printContainer.appendChild(monthsWrapper);
-    
-    const style = document.createElement('style');
-    style.textContent = `
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .print-container, .print-container * {
-                visibility: visible;
-            }
-            .print-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                padding: 20px;
-                background: white;
-            }
-            .stat-card {
-                break-inside: avoid;
-            }
-            .month-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-            table {
-                break-inside: avoid;
-            }
-            @page {
-                size: landscape;
-                margin: 1cm;
+
+        // 3. შესვლის (Login) დამუშავება
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+
+            if (u === 'alex' && p === '2911') {
+                sessionStorage.setItem('shogi_auth', 'true');
+                document.getElementById('loginScreen').classList.remove('active');
+                showToast("წარმატებული ავტორიზაცია!");
+                refreshSystemWithoutReload();
+            } else {
+                showToast("არასწორი მომხმარებელი ან პაროლი!", "error");
             }
         }
-    `;
-    printContainer.appendChild(style);
-    
-    document.body.appendChild(printContainer);
-    
-    window.print();
-    
-    setTimeout(() => {
-        document.body.removeChild(printContainer);
-    }, 100);
-}
 
-function renderCurrentMonth() {
-    if (currentDisplayYear === undefined || currentDisplayMonth === undefined) {
-        const today = new Date();
-        currentDisplayYear = today.getFullYear();
-        currentDisplayMonth = today.getMonth();
-    }
-    
-    const key = getMonthKey(currentDisplayYear, currentDisplayMonth);
-    
-    const monthData = monthlyData[key] || { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
-    
-    const daysInMonth = new Date(currentDisplayYear, currentDisplayMonth + 1, 0).getDate();
-    
-    document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
-    
-    const tableHeader = document.getElementById('tableHeader');
-    tableHeader.innerHTML = '';
-    
-    let firstRow = document.createElement('tr');
-    let emptyTh = document.createElement('th');
-    emptyTh.textContent = 'ტიპი';
-    emptyTh.style.background = '#2c3e50';
-    emptyTh.style.color = 'white';
-    emptyTh.style.minWidth = '180px';
-    firstRow.appendChild(emptyTh);
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const th1 = document.createElement('th');
-        th1.textContent = day;
-        th1.style.background = '#2c3e50';
-        th1.style.color = 'white';
-        th1.style.minWidth = '70px';
-        firstRow.appendChild(th1);
-    }
-    
-    tableHeader.appendChild(firstRow);
-    
-    const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = '';
-    
-    const rows = [
-        { name: "მორიგეობა", field: "duty", step: 0.5 },
-        { name: "ობსერვაცია", field: "obs", step: 1 },
-        { name: "ჰემოტრანსფუზია", field: "trans", step: 1 },
-        { name: "დღის სტაციონარი", field: "station", step: 1 }
-    ];
-    
-    rows.forEach(row => {
-        let tr = document.createElement('tr');
-        let tdLabel = document.createElement('td');
-        tdLabel.className = 'type-header';
-        tdLabel.textContent = row.name;
-        tr.appendChild(tdLabel);
-        
-        for (let day = 1; day <= daysInMonth; day++) {
-let value = 0;
-if (row.field === 'duty') {
-    const shift = monthData.shifts[day] || { duty: 0 };
-    value = shift.duty || 0;
-} else {
-    const shift = monthData.shifts[day] || {};
-    const extra = (monthData.extras && monthData.extras[day]) || {};
-    value = (shift[row.field] || extra[row.field] || 0);
-}
+        let customPopupCallback = null;
+        function showCustomPopup({ title, text, showInput = false, inputValue = '', onConfirm }) {
+            document.getElementById('customPopupTitle').innerText = title;
+            document.getElementById('customPopupText').innerText = text;
+            const inputContainer = document.getElementById('customPopupInputContainer');
+            const inputField = document.getElementById('customPopupInput');
             
-const isDutyRow = row.field === "duty";
-const hasShiftOnThisDay = monthData.shifts[day] !== undefined;
-const shouldBeGreen = isDutyRow && hasShiftOnThisDay;
-            const cellClass = shouldBeGreen ? 'shift-cell' : '';
-            
-            const td = document.createElement('td');
-            td.className = cellClass;
-            
-            if (isDutyRow) {
-                td.style.cursor = 'pointer';
-                td.style.textAlign = 'center';
-                td.style.fontWeight = 'bold';
-                td.style.fontSize = '14px';
-                
-                const displayValue = value === 0 ? '' : value;
-                td.textContent = displayValue;
-                
-                td.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const currentVal = value;
-                    console.log('Cell clicked for day:', day, 'current value:', currentVal);
-                    handleShiftCellClick(currentDisplayYear, currentDisplayMonth, day, currentVal);
+            if (showInput) {
+                inputContainer.style.display = 'block';
+                inputField.value = inputValue;
+                setTimeout(() => inputField.focus(), 50);
+            } else {
+                inputContainer.style.display = 'none';
+            }
+
+            customPopupCallback = onConfirm;
+            document.getElementById('customPopup').classList.add('active');
+        }
+
+        function closeCustomPopup(confirmed) {
+            document.getElementById('customPopup').classList.remove('active');
+            if (customPopupCallback) {
+                const inputVal = document.getElementById('customPopupInput').value;
+                customPopupCallback(confirmed, inputVal);
+                customPopupCallback = null;
+            }
+        }
+
+        // 1. ShogiCalendar-ზე დაჭერისას გვერდის განახლება (გარეშე გადატვირთვის)
+        function refreshSystemWithoutReload() {
+            showLoader();
+            setTimeout(() => {
+                events = JSON.parse(localStorage.getItem('shogi_events')) || {};
+                eventTypes = JSON.parse(localStorage.getItem('shogi_types')) || ["სამსახური", "სწავლა", "პირადი"];
+                currentDate = new Date();
+                renderTypesSelect();
+                renderTypesManageList();
+                renderCalendar();
+                updateDailyBanner();
+                hideLoader();
+                showToast("სისტემა განახლდა");
+            }, 200);
+        }
+
+        function validateField(field) {
+            if (field.classList.contains('required-field')) {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                } else {
+                    field.classList.remove('error');
+                }
+            }
+        }
+
+        function autoFormatStartTime(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length >= 2) {
+                let hours = val.substring(0, 2);
+                if (parseInt(hours) > 23) hours = "23";
+                val = hours + ":" + val.substring(2, 4);
+            }
+            input.value = val;
+
+            if (val.length === 5) {
+                document.getElementById('endTime').focus();
+            }
+        }
+
+        function autoFormatEndTime(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length >= 2) {
+                let hours = val.substring(0, 2);
+                if (parseInt(hours) > 23) hours = "23";
+                val = hours + ":" + val.substring(2, 4);
+            }
+            input.value = val;
+        }
+
+        function validateEndTime(endInput) {
+            const startInput = document.getElementById('startTime');
+            const startVal = startInput.value.trim();
+            const endVal = endInput.value.trim();
+
+            if (startVal.length === 5 && endVal.length === 5) {
+                if (endVal < startVal) {
+                    endInput.classList.add('error');
+                    showToast("დასრულების დრო არ შეიძლება იყოს დაწყების დროზე ადრე!", "error");
+                } else {
+                    endInput.classList.remove('error');
+                }
+            } else {
+                endInput.classList.remove('error');
+            }
+        }
+
+        const monthsGeo = [
+            "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
+            "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი"
+        ];
+
+        const priorityColors = {
+            "1": "var(--prio-1)",
+            "2": "var(--prio-2)",
+            "3": "var(--prio-3)",
+            "4": "var(--prio-4)",
+            "5": "var(--prio-5)"
+        };
+
+        function showLoader() {
+            document.getElementById('loaderOverlay').style.display = 'flex';
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderOverlay').style.display = 'none';
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOutToRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function initApp() {
+            showLoader();
+            setTimeout(() => {
+                renderTypesSelect();
+                renderTypesManageList();
+                renderCalendar();
+                updateDailyBanner();
+                hideLoader();
+            }, 250);
+            setInterval(updateDailyBanner, 60000);
+        }
+
+        function renderTypesSelect() {
+            const select = document.getElementById('eventType');
+            select.innerHTML = '';
+            eventTypes.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.innerText = t;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderTypesManageList() {
+            const container = document.getElementById('typesManageList');
+            container.innerHTML = '';
+            eventTypes.forEach((t, index) => {
+                const pill = document.createElement('div');
+                pill.className = 'type-pill';
+                pill.innerHTML = `
+                    <span>${t}</span>
+                    <div style="display:flex; gap:6px; align-items:center; margin-left:6px;">
+                        <button type="button" onclick="editTypePrompt(${index})" title="შეცვლა" style="color:var(--primary);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button type="button" onclick="deleteType(${index})" title="წაშლა" class="del-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(pill);
+            });
+        }
+
+        function addNewType() {
+            const input = document.getElementById('newTypeName');
+            const val = input.value.trim();
+            if (!val) {
+                showToast("გთხოვთ ჩაწეროთ ტიპის სახელი", "error");
+                return;
+            }
+            if (eventTypes.includes(val)) {
+                showToast("ეს ტიპი უკვე არსებობს", "error");
+                return;
+            }
+            showLoader();
+            setTimeout(() => {
+                eventTypes.push(val);
+                localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
+                input.value = '';
+                renderTypesSelect();
+                renderTypesManageList();
+                hideLoader();
+                showToast("ტიპი წარმატებით დაემატა");
+            }, 200);
+        }
+
+        function editTypePrompt(index) {
+            const oldName = eventTypes[index];
+            showCustomPopup({
+                title: "ტიპის რედაქტირება",
+                text: "შეიყვანეთ ტიპის ახალი სახელი:",
+                showInput: true,
+                inputValue: oldName,
+                onConfirm: (confirmed, newVal) => {
+                    if (confirmed && newVal && newVal.trim() !== "" && newVal.trim() !== oldName) {
+                        const cleaned = newVal.trim();
+                        if (eventTypes.includes(cleaned)) {
+                            showToast("ასეთი ტიპი უკვე არსებობს", "error");
+                            return;
+                        }
+                        showLoader();
+                        setTimeout(() => {
+                            eventTypes[index] = cleaned;
+                            localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
+                            
+                            Object.keys(events).forEach(id => {
+                                if (events[id].type === oldName) {
+                                    events[id].type = cleaned;
+                                }
+                            });
+                            localStorage.setItem('shogi_events', JSON.stringify(events));
+
+                            renderTypesSelect();
+                            renderTypesManageList();
+                            renderCalendar();
+                            hideLoader();
+                            showToast("ტიპი განახლდა");
+                        }, 200);
+                    }
+                }
+            });
+        }
+
+        function deleteType(index) {
+            if (eventTypes.length <= 1) {
+                showToast("კალენდარს მინიმუმ ერთი ტიპი უნდა ჰქონდეს", "error");
+                return;
+            }
+            showLoader();
+            setTimeout(() => {
+                const removed = eventTypes.splice(index, 1)[0];
+                localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
+                renderTypesSelect();
+                renderTypesManageList();
+                hideLoader();
+                showToast(`ტიპი (${removed}) წაიშალა`);
+            }, 200);
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('monthDisplay').innerText = `${monthsGeo[month]} ${year}`;
+
+            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const prevLastDay = new Date(year, month, 0).getDate();
+
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
+
+            for (let i = firstDayIndex; i > 0; i--) {
+                grid.appendChild(createDayCell(prevLastDay - i + 1, true));
+            }
+
+            const today = new Date();
+            for (let i = 1; i <= lastDay; i++) {
+                const isToday = i === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const formattedMonth = String(month + 1).padStart(2, '0');
+                const formattedDay = String(i).padStart(2, '0');
+                const dateKey = `${year}-${formattedMonth}-${formattedDay}`;
+
+                grid.appendChild(createDayCell(i, false, isToday, dateKey));
+            }
+
+            const totalCellsSoFar = firstDayIndex + lastDay;
+            const remainingCells = totalCellsSoFar % 7 === 0 ? 0 : 7 - (totalCellsSoFar % 7);
+            for (let i = 1; i <= remainingCells; i++) {
+                grid.appendChild(createDayCell(i, true));
+            }
+        }
+
+        function createDayCell(dayNum, isOtherMonth, isToday = false, dateKey = null) {
+            const cell = document.createElement('div');
+            cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
+
+            const numberDiv = document.createElement('div');
+            numberDiv.className = 'day-number';
+            numberDiv.innerText = dayNum;
+            cell.appendChild(numberDiv);
+
+            if (!isOtherMonth && dateKey) {
+                cell.onclick = () => openDayDetails(dateKey);
+
+                Object.keys(events).forEach(id => {
+                    const ev = events[id];
+                    if (isDateInRange(dateKey, ev.startDate, ev.endDate)) {
+                        const chip = document.createElement('div');
+                        chip.className = 'event-chip';
+                        chip.style.backgroundColor = priorityColors[ev.priority] || 'var(--primary)';
+                        const timeStr = ev.startTime ? ` [${ev.startTime}]` : '';
+                        chip.innerText = `${ev.type}: ${ev.title}${timeStr}`;
+                        cell.appendChild(chip);
+                    }
                 });
+            }
+
+            return cell;
+        }
+
+        function isDateInRange(target, start, end) {
+            return target >= start && target <= end;
+        }
+
+        function changeMonth(direction) {
+            showLoader();
+            setTimeout(() => {
+                currentDate.setMonth(currentDate.getMonth() + direction);
+                renderCalendar();
+                hideLoader();
+            }, 150);
+        }
+
+        function openEventModal() {
+            document.getElementById('modalTitle').innerText = "ღონისძიების დამატება";
+            const titleInput = document.getElementById('eventTitle');
+            const startDateInput = document.getElementById('eventStartDate');
+            const endDateInput = document.getElementById('eventEndDate');
+            const startTimeInput = document.getElementById('startTime');
+            const endTimeInput = document.getElementById('endTime');
+            
+            titleInput.value = '';
+            titleInput.classList.remove('error');
+            startDateInput.classList.remove('error');
+            endDateInput.classList.remove('error');
+            startTimeInput.classList.remove('error');
+            endTimeInput.classList.remove('error');
+
+            document.getElementById('eventDesc').value = '';
+            document.getElementById('eventPriority').value = '3';
+            startTimeInput.value = '';
+            endTimeInput.value = '';
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            startDateInput.value = todayStr;
+            endDateInput.value = '';
+            document.getElementById('eventId').value = '';
+            
+            document.getElementById('deleteEventBtn').style.display = 'none';
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        function saveEvent() {
+            const titleInput = document.getElementById('eventTitle');
+            const startDateInput = document.getElementById('eventStartDate');
+            const endDateInput = document.getElementById('eventEndDate');
+            const startTimeInput = document.getElementById('startTime');
+            const endTimeInput = document.getElementById('endTime');
+
+            const title = titleInput.value.trim();
+            const startDate = startDateInput.value;
+            let endDate = endDateInput.value.trim();
+            const startTime = startTimeInput.value.trim();
+            const endTime = endTimeInput.value.trim();
+
+            let hasError = false;
+            if (!title) {
+                titleInput.classList.add('error');
+                hasError = true;
+            }
+            if (!startDate) {
+                startDateInput.classList.add('error');
+                hasError = true;
+            }
+
+            if (hasError) {
+                showToast("გთხოვთ შეავსოთ სავალდებულო ველები!", "error");
+                return;
+            }
+
+            if (!endDate) {
+                endDate = startDate;
+            }
+
+            if (startDate > endDate) {
+                endDateInput.classList.add('error');
+                showToast("დასრულების თარიღი არ შეიძლება იყოს დაწყების თარიღზე ადრე!", "error");
+                return;
             } else {
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.className = 'table-input';
-                input.value = value === 0 ? '' : value;
-                input.step = row.step;
-                input.min = 0;
-                input.setAttribute('data-day', day);
-                input.setAttribute('data-field', row.field);
-                
-                input.onchange = function(e) {
-                    updateShiftValue(day, row.field, this.value);
-                };
-                
-                td.appendChild(input);
+                endDateInput.classList.remove('error');
             }
+
+            if (startTime.length === 5 && endTime.length === 5 && endTime < startTime) {
+                endTimeInput.classList.add('error');
+                showToast("დასრულების დრო არ შეიძლება იყოს დაწყების დროზე ადრე!", "error");
+                return;
+            } else {
+                endTimeInput.classList.remove('error');
+            }
+
+            const desc = document.getElementById('eventDesc').value.trim();
+            const priority = document.getElementById('eventPriority').value;
+            const type = document.getElementById('eventType').value;
+            let id = document.getElementById('eventId').value;
+
+            showLoader();
+            setTimeout(() => {
+                if (!id) {
+                    id = 'evt_' + Date.now();
+                }
+
+                events[id] = { title, desc, priority, type, startDate, endDate, startTime, endTime };
+                localStorage.setItem('shogi_events', JSON.stringify(events));
+                
+                closeEventModal();
+                renderCalendar();
+                updateDailyBanner();
+                hideLoader();
+                showToast("ღონისძიება წარმატებით შეინახა!");
+            }, 200);
+        }
+
+        function deleteEntireEventPrompt() {
+            const id = document.getElementById('eventId').value;
+            if (id && events[id]) {
+                closeEventModal();
+                openDeleteOptionsModal(id, events[id].startDate);
+            }
+        }
+
+        function openDayDetails(dateKey) {
+            currentActiveDayForKey = dateKey;
+            const [y, m, d] = dateKey.split('-');
+            document.getElementById('dayDetailsTitle').innerText = `${d}.${m}.${y} - დაგეგმილი ღონისძიებები`;
             
-            tr.appendChild(td);
+            renderDayDetailsList(dateKey);
+            document.getElementById('dayDetailsModal').classList.add('active');
         }
-        
-        tableBody.appendChild(tr);
-    });
 
-    calculateAndDisplayTotal();
-}
-    
-function goPrevMonth() {
-    console.log('goPrevMonth called');
-    let newMonth = currentDisplayMonth - 1;
-    let newYear = currentDisplayYear;
-    
-    if (newMonth < 0) {
-        newMonth = 11;
-        newYear--;
-    }
-    
-    currentDisplayYear = newYear;
-    currentDisplayMonth = newMonth;
-    console.log('New month:', newMonth, newYear);
-    renderCurrentMonth();
-}
+        function renderDayDetailsList(dateKey) {
+            const listContainer = document.getElementById('dayDetailsList');
+            listContainer.innerHTML = '';
 
-function goNextMonth() {
-    console.log('goNextMonth called');
-    let newMonth = currentDisplayMonth + 1;
-    let newYear = currentDisplayYear;
-    
-    if (newMonth > 11) {
-        newMonth = 0;
-        newYear++;
-    }
-    
-    currentDisplayYear = newYear;
-    currentDisplayMonth = newMonth;
-    console.log('New month:', newMonth, newYear);
-    renderCurrentMonth();
-}
-    
-    function showAddMonthModal() {
-        document.getElementById('addMonthModal').style.display = 'flex';
-    }
-    
-    function addNewMonth() {
-        const month = parseInt(document.getElementById('newMonth').value);
-        const year = parseInt(document.getElementById('newYear').value);
-        const key = getMonthKey(year, month);
-        
-        if (monthlyData[key]) {
-            showPopup(`${georgianMonths[month]} ${year} უკვე არსებობს!`, "error");
-            return;
-        }
-        
-        monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
-        saveData();
-        showPopup(`დაემატა ახალი თვე: ${georgianMonths[month]} ${year}`, "success");
-        closeModal('addMonthModal');
-        
-        currentDisplayYear = year;
-        currentDisplayMonth = month;
-        renderCurrentMonth();
-    }
-    
-    function getNextMonthFromNow() {
-        const today = new Date();
-        let nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        return { year: nextMonthDate.getFullYear(), month: nextMonthDate.getMonth() };
-    }
-    
-function openAddShiftForNextMonthOnly() {
-    const targetYear = currentDisplayYear;
-    const targetMonth = currentDisplayMonth;
-    const targetKey = getMonthKey(targetYear, targetMonth);
-    
-    if (!monthlyData[targetKey]) {
-        showPopup(`არ არსებობს ${georgianMonths[targetMonth]} ${targetYear}. გთხოვთ დაამატოთ თვე!`, "error");
-        return;
-    }
-    
-    nextMonthTarget = { year: targetYear, month: targetMonth };
-    const monthData = monthlyData[targetKey];
-    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
-    
-    const datesGrid = document.getElementById('datesGrid');
-    datesGrid.innerHTML = '';
-    selectedShiftDays = [];
-    
-    const existingShifts = monthData.shifts || {};
-    const existingDays = Object.keys(existingShifts).map(Number);
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateDiv = document.createElement('div');
-        dateDiv.className = 'date-cell-select';
-        dateDiv.textContent = day;
-        
-        if (existingDays.includes(day)) {
-            dateDiv.classList.add('selected');
-            selectedShiftDays.push(day);
-        }
-        
-        dateDiv.onclick = (function(d) {
-            return function() {
-                if (this.classList.contains('selected')) {
-                    this.classList.remove('selected');
-                    const index = selectedShiftDays.indexOf(d);
-                    if (index > -1) selectedShiftDays.splice(index, 1);
-                } else {
-                    this.classList.add('selected');
-                    selectedShiftDays.push(d);
+            let foundAny = false;
+            Object.keys(events).forEach(id => {
+                const ev = events[id];
+                if (isDateInRange(dateKey, ev.startDate, ev.endDate)) {
+                    foundAny = true;
+                    const item = document.createElement('div');
+                    item.className = 'detail-item';
+                    item.style.borderLeftColor = priorityColors[ev.priority];
+                    const timeRange = ev.startTime ? ` (${ev.startTime} - ${ev.endTime || '...' })` : '';
+                    
+                    item.innerHTML = `
+                        <div>
+                            <strong>${ev.title}</strong> <span style="font-size:12px; color:var(--text-muted);">(${ev.type})${timeRange}</span>
+                            <div style="font-size:13px; margin-top:4px;">${ev.desc || 'აღწერა არ არის'}</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">პერიოდი: ${ev.startDate} / ${ev.endDate}</div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-outline btn-sm" onclick="editEvent('${id}')">რედაქტირება</button>
+                            <button class="btn btn-danger btn-sm" onclick="openDeleteOptionsModal('${id}', '${dateKey}')">წაშლა</button>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
                 }
-            };
-        })(day);
-        
-        datesGrid.appendChild(dateDiv);
-    }
-    
-    document.getElementById('shiftInsurance').checked = monthData.insurance || false;
-    document.getElementById('fitpassCheckbox').checked = monthData.fitpass || false;
-    
-    const warningDiv = document.getElementById('shiftMonthWarning');
-    warningDiv.innerHTML = `ამორჩეული თვე: <strong>${georgianMonths[targetMonth]} ${targetYear}</strong>`;
-    warningDiv.style.background = "#e8f0fe";
-    warningDiv.style.color = "#1f6e8c";
-    
-    document.getElementById('addShiftModal').style.display = 'flex';
-}
-    
-function saveSelectedDates() {
-    if (!nextMonthTarget) {
-        showPopup("შეცდომა: სამიზნე თვე არ არის განსაზღვრული", "error");
-        return;
-    }
-    
-    const { year, month } = nextMonthTarget;
-    const key = getMonthKey(year, month);
-    
-    if (!monthlyData[key]) {
-        monthlyData[key] = { shifts: {}, insurance: false, fitpass: false, actualAmount: 0 };
-    }
-    
-    monthlyData[key].insurance = document.getElementById('shiftInsurance').checked;
-    monthlyData[key].fitpass = document.getElementById('fitpassCheckbox').checked;
-    
-    const existingShifts = monthlyData[key].shifts || {};
-    const newShifts = {};
-    
-    selectedShiftDays.forEach(day => {
-        if (existingShifts[day]) {
-            newShifts[day] = { ...existingShifts[day] };
-        } else {
-            newShifts[day] = { duty: 0, obs: 0, trans: 0, station: 0 };
-        }
-    });
-    
-    monthlyData[key].shifts = newShifts;
-    
-    saveData();
-    closeModal('addShiftModal');
-    
-    showPopup(`${selectedShiftDays.length} თარიღი დამატებულია. დაზღვევა: ${monthlyData[key].insurance ? "ჩართულია" : "გათიშულია"}, Fitpass: ${monthlyData[key].fitpass ? "ჩართულია" : "გათიშულია"}`, "success");
-
-    if (currentDisplayYear === year && currentDisplayMonth === month) {
-        renderCurrentMonth();
-    }
-}
-    
-function showOtherMonthsModal() {
-    const monthsContainer = document.getElementById('monthsContainer');
-    const globalStats = document.getElementById('globalStats');
-    
-    let totalEarnedAll = 0;
-    let maxActual = 0;
-    let minActual = Infinity;
-    let allExpected = [];
-    
-    Object.keys(monthlyData).forEach(key => {
-        const data = monthlyData[key];
-        let expected = 0;
-        
-const [year, month] = key.split('-').map(Number);
-const dutyRate = getDutyRate(year, month);
-const obsRate = getObsRate(year, month);
-
-if (data.shifts) {
-    Object.values(data.shifts).forEach(shift => {
-        expected += (shift.duty * dutyRate);
-        expected += (shift.obs * obsRate);
-        expected += (shift.trans * TRANS_RATE);
-        expected += (shift.station * STATION_RATE);
-    });
-}
-
-if (data.extras) {
-    Object.values(data.extras).forEach(extra => {
-        expected += (extra.obs * obsRate);
-        expected += (extra.trans * TRANS_RATE);
-        expected += (extra.station * STATION_RATE);
-    });
-}
-        
-        if (data.insurance) expected -= INSURANCE_DEDUCTION;
-        if (data.fitpass) expected -= FITPASS_DEDUCTION;
-        allExpected.push(expected);
-        
-        if (data.actualAmount && data.actualAmount > 0) {
-            totalEarnedAll += data.actualAmount;
-            if (data.actualAmount > maxActual) maxActual = data.actualAmount;
-            if (data.actualAmount < minActual) minActual = data.actualAmount;
-        }
-    });
-    
-    if (minActual === Infinity) minActual = 0;
-    
-    let filteredExpected = allExpected.filter(val => val > 0);
-    let maxExpected = filteredExpected.length > 0 ? Math.max(...filteredExpected) : 0;
-    let minExpected = filteredExpected.length > 0 ? Math.min(...filteredExpected) : 0;
-    
-    globalStats.innerHTML = `
-        <div class="stat-card">
-            <h4>ჩარიცხული სულ</h4>
-            <div class="value">${totalEarnedAll.toFixed(2)} ₾</div>
-        </div>
-        <div class="stat-card">
-            <h4>მაქს. ჩარიცხული</h4>
-            <div class="value">${maxActual.toFixed(2)} ₾</div>
-        </div>
-        <div class="stat-card">
-            <h4>მინ. ჩარიცხული</h4>
-            <div class="value">${minActual.toFixed(2)} ₾</div>
-        </div>
-        <div class="stat-card">
-            <h4>მაქს. მოლოდინი</h4>
-            <div class="value">${maxExpected.toFixed(2)} ₾</div>
-        </div>
-        <div class="stat-card">
-            <h4>მინ. მოლოდინი</h4>
-            <div class="value">${minExpected.toFixed(2)} ₾</div>
-        </div>
-    `;
-    
-    monthsContainer.innerHTML = '';
-    
-    const sortedKeys = Object.keys(monthlyData).sort().reverse();
-    
-    if (sortedKeys.length === 0) {
-        monthsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">მონაცემები არ არის</div>';
-        document.getElementById('otherMonthsModal').style.display = 'flex';
-        return;
-    }
-    
-    sortedKeys.forEach(key => {
-        const [year, month] = key.split('-').map(Number);
-        const data = monthlyData[key];
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const monthName = `${georgianMonths[month]} ${year}`;
-        
-        let totalDuty = 0;
-        let totalObs = 0;
-        let totalTrans = 0;
-        let totalStation = 0;
-        
-        if (data.shifts) {
-            Object.values(data.shifts).forEach(shift => {
-                totalDuty += (shift.duty || 0);
-                totalObs += (shift.obs || 0);
-                totalTrans += (shift.trans || 0);
-                totalStation += (shift.station || 0);
             });
-        }
-        
-        if (data.extras) {
-            Object.values(data.extras).forEach(extra => {
-                totalObs += (extra.obs || 0);
-                totalTrans += (extra.trans || 0);
-                totalStation += (extra.station || 0);
-            });
-        }
-        
-const dutyRate = getDutyRate(year, month);
-const obsRate = getObsRate(year, month);
 
-let expected = (totalDuty * dutyRate) + (totalObs * obsRate) + (totalTrans * TRANS_RATE) + (totalStation * STATION_RATE);
-if (data.insurance) expected -= INSURANCE_DEDUCTION;
-        if (data.fitpass) expected -= FITPASS_DEDUCTION;
-        
-        const actualAmount = data.actualAmount || 0;
-        
-        let tableHtml = `
-            <div class="month-card" style="margin-bottom: 30px; overflow: hidden;">
-                <div class="month-card-header" style="background: linear-gradient(135deg, #1f6e8c, #0e4e6b); color: white; border-radius: 0; display: flex; justify-content: space-between; align-items: center;">
-                    <span>${monthName}</span>
-                    <button onclick="deleteMonth('${key}', '${monthName}')" style="background: rgba(231, 76, 60, 0.8); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='#e74c3c'" onmouseout="this.style.background='rgba(231, 76, 60, 0.8)'">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-                <div style="overflow-x: auto; padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                        <thead>
-                            <tr>
-                                <th style="background: #2c3e50; color: white; padding: 10px; text-align: left; position: sticky; left: 0; min-width: 180px;">ტიპი</th>
-        `;
-        
-        for (let day = 1; day <= daysInMonth; day++) {
-            tableHtml += `<th style="background: #2c3e50; color: white; padding: 8px; text-align: center; min-width: 50px;">${day}</th>`;
+            if (!foundAny) {
+                listContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">ამ დღეს ღონისძიებები არ არის დაგეგმილი.</div>`;
+            }
         }
-        
-        tableHtml += `<th style="background: #2c3e50; color: white; padding: 10px; text-align: center; min-width: 80px;">ჯამი</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-        `;
-        
-tableHtml += `<tr>
-    <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0; text-align: left; font-size: inherit;">მორიგეობა</td>`;
-for (let day = 1; day <= daysInMonth; day++) {
-    const shiftVal = (data.shifts && data.shifts[day] && data.shifts[day].duty) || 0;
-    const cellStyle = shiftVal > 0 ? 'background-color: #2b7a4b; color: white; font-weight: bold; text-align: center; padding: 8px;' : 'text-align: center; padding: 8px;';
-tableHtml += `<td style="${cellStyle}">${shiftVal > 0 ? shiftVal : ''}</td>`;
-  
-}
-tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalDuty} სთ</td>
-             </tr>`;
-        
-        tableHtml += `<tr>
-            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">ობსერვაცია</td>`;
-        for (let day = 1; day <= daysInMonth; day++) {
-            let obsVal = 0;
-            if (data.shifts && data.shifts[day]) obsVal += (data.shifts[day].obs || 0);
-            if (data.extras && data.extras[day]) obsVal += (data.extras[day].obs || 0);
-tableHtml += `<td style="text-align: center; padding: 8px;">${obsVal > 0 ? obsVal : ''}</td>`;
-}
-        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalObs}</td>
-        </tr>`;
-        
-        tableHtml += `<tr>
-            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">ჰემოტრანსფუზია</td>`;
-        for (let day = 1; day <= daysInMonth; day++) {
-            let transVal = 0;
-            if (data.shifts && data.shifts[day]) transVal += (data.shifts[day].trans || 0);
-            if (data.extras && data.extras[day]) transVal += (data.extras[day].trans || 0);
-tableHtml += `<td style="text-align: center; padding: 8px;">${transVal > 0 ? transVal : ''}</td>`;
-}
-        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalTrans}</td>
-        </tr>`;
-        
-        tableHtml += `<tr>
-            <td style="background: #e9f0f5; font-weight: 800; padding: 10px; position: sticky; left: 0;">დღის სტაციონარი</td>`;
-        for (let day = 1; day <= daysInMonth; day++) {
-            let stationVal = 0;
-            if (data.shifts && data.shifts[day]) stationVal += (data.shifts[day].station || 0);
-            if (data.extras && data.extras[day]) stationVal += (data.extras[day].station || 0);
-tableHtml += `<td style="text-align: center; padding: 8px;">${stationVal > 0 ? stationVal : ''}</td>`;
-}
-        tableHtml += `<td style="text-align: center; font-weight: bold; background: #e9f0f5; padding: 8px;">${totalStation}</td>
-        </tr>`;
-        
-        tableHtml += `
-                        </tbody>
-                    </table>
-                </div>
-<div style="padding: 20px 20px 15px 20px; border-top: 1px solid #e2edf2; text-align: right;">
-    <div style="font-size: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 20px; flex-wrap: wrap;">
-        <div>
-            <span style="font-weight: 600;">მოსალოდნელი:</span>
-            <span style="color: #e74c3c; font-weight: 800; font-size: 18px; margin-left: 8px;">${expected.toFixed(2)} ₾</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 600;">ჩარიცხული:</span>
-            <span id="actualAmountDisplay_${key.replace(/-/g, '_')}" style="color: #27ae60; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="promptActualAmount('${key}', ${actualAmount})">${actualAmount.toFixed(2)} ₾</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; padding-left: 20px; border-left: 2px solid #e2edf2;">
-            <span style="font-weight: 600;"></span>
-            ${(() => {
-                const difference = actualAmount - expected;
-                const absDifference = Math.abs(difference).toFixed(2);
-                if (difference > 0) {
-                    return `<span style="color: #27ae60; font-weight: 800; font-size: 18px;">+${absDifference} ₾</span>`;
-                } else if (difference < 0) {
-                    return `<span style="color: #e74c3c; font-weight: 800; font-size: 18px;">-${absDifference} ₾</span>`;
-                } else {
-                    return `<span style="color: #4a5568; font-weight: 800; font-size: 18px;">0 ₾</span>`;
-                }
-            })()}
-        </div>
-    </div>
-    <div style="display: flex; gap: 20px; justify-content: flex-end; font-size: 13px; color: #4a5568; padding-top: 10px; margin-top: 10px; border-top: 1px dashed #e2edf2;">
-        <span style="display: inline-flex; align-items: center; gap: 6px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                ${data.insurance ? 
-                    '<path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#27ae60"/>' : 
-                    '<path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#e74c3c"/>'
-                }
-            </svg>
-            დაზღვევა ${data.insurance ? '100 ₾' : ''}
-        </span>
-        <span style="display: inline-flex; align-items: center; gap: 6px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                ${data.fitpass ? 
-                    '<path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#27ae60"/>' : 
-                    '<path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#e74c3c"/>'
-                }
-            </svg>
-            Fitpass ${data.fitpass ? '85 ₾' : ''}
-        </span>
-    </div>
-</div>
-            </div>
-        `;
-        
-        monthsContainer.innerHTML += tableHtml;
-    });
-    
-    document.getElementById('otherMonthsModal').style.display = 'flex';
-}
-    
-    function promptActualAmount(monthKey, currentAmount) {
-    let overlay = document.getElementById('actualAmountOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'actualAmountOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.backdropFilter = 'blur(5px)';
-        overlay.style.zIndex = '3000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
-            <h3 style="margin-bottom: 20px; font-size: 24px; color: #1f6e8c;">თანხის შეცვლა</h3>
-            <p style="margin-bottom: 15px; color: #4a5568;">მიმდინარე მნიშვნელობა: <strong>${currentAmount.toFixed(2)} ₾</strong></p>
-            <input type="number" id="newActualAmount" step="0.01" min="0" value="${currentAmount}" 
-                   style="width: 80%; padding: 14px; border-radius: 50px; border: 2px solid #e2e8f0; font-size: 18px; text-align: center; margin-bottom: 20px;" 
-                   placeholder="თანხა ₾">
-            <div>
-                <button id="saveActualAmount" style="background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">შენახვა</button>
-                <button id="cancelActualAmount" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">გაუქმება</button>
-            </div>
-        </div>
-    `;
-    
-    overlay.style.display = 'flex';
-    
-    document.getElementById('saveActualAmount').onclick = () => {
-        const newAmount = parseFloat(document.getElementById('newActualAmount').value);
-        if (!isNaN(newAmount) && newAmount >= 0) {
-            updateActualAmount(monthKey, newAmount);
-            overlay.style.display = 'none';
-            showPopup("ჩარიცხული თანხა განახლდა!", "success");
-        } else {
-            showPopup("გთხოვთ შეიყვანოთ სწორი თანხა", "error");
-        }
-    };
-    
-    document.getElementById('cancelActualAmount').onclick = () => {
-        overlay.style.display = 'none';
-    };
-}
 
-function updateActualAmount(monthKey, amount) {
-    if (monthlyData[monthKey]) {
-        monthlyData[monthKey].actualAmount = parseFloat(amount) || 0;
-        saveData();
-        showOtherMonthsModal();
-    }
-}
-    
-    function deleteMonth(monthKey, monthName) {
-    let overlay = document.getElementById('deleteMonthOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'deleteMonthOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.backdropFilter = 'blur(5px)';
-        overlay.style.zIndex = '3000';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        document.body.appendChild(overlay);
-    }
-    
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 40px; padding: 35px; width: 90%; max-width: 400px; text-align: center; animation: modalSlideIn 0.3s ease-out;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: #e74c3c; margin-bottom: 15px;"></i>
-            <h3 style="margin-bottom: 15px; color: #2d3748;">წაშლა</h3>
-            <p style="margin-bottom: 25px; color: #718096;">ნამდვილად გსურთ წაშალოთ <strong>${monthName}</strong>?<br>ყველა მონაცემი სამუდამოდ წაიშლება!</p>
-            <div>
-                <button id="confirmDelete" style="background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">წაშლა</button>
-                <button id="cancelDelete" style="background: #95a5a6; color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin: 5px; cursor: pointer;">გაუქმება</button>
-            </div>
-        </div>
-    `;
-    
-    overlay.style.display = 'flex';
-    
-    document.getElementById('confirmDelete').onclick = () => {
-        if (monthlyData[monthKey]) {
-            delete monthlyData[monthKey];
-            saveData();
-            overlay.style.display = 'none';
-            showPopup(`${monthName} წაიშალა!`, "success");
-            showOtherMonthsModal();
+        function closeDayDetailsModal() {
+            document.getElementById('dayDetailsModal').classList.remove('active');
+        }
+
+        function editEvent(id) {
+            closeDayDetailsModal();
+            const ev = events[id];
+            document.getElementById('modalTitle').innerText = "ღონისძიების რედაქტირება";
             
-            const currentKey = getMonthKey(currentDisplayYear, currentDisplayMonth);
-            if (currentKey === monthKey) {
-                const remainingMonths = Object.keys(monthlyData).sort();
-                if (remainingMonths.length > 0) {
-                    const [lastYear, lastMonth] = remainingMonths[remainingMonths.length - 1].split('-').map(Number);
-                    currentDisplayYear = lastYear;
-                    currentDisplayMonth = lastMonth;
-                    renderCurrentMonth();
+            const titleInput = document.getElementById('eventTitle');
+            titleInput.value = ev.title;
+            titleInput.classList.remove('error');
+
+            document.getElementById('eventDesc').value = ev.desc;
+            document.getElementById('eventPriority').value = ev.priority;
+            document.getElementById('eventType').value = ev.type;
+            
+            document.getElementById('startTime').value = ev.startTime || '';
+            document.getElementById('endTime').value = ev.endTime || '';
+            document.getElementById('eventId').value = id;
+
+            document.getElementById('eventStartDate').value = ev.startDate;
+            document.getElementById('eventEndDate').value = (ev.startDate === ev.endDate) ? '' : ev.endDate;
+
+            document.getElementById('deleteEventBtn').style.display = 'inline-flex';
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function openDeleteOptionsModal(eventId, dateKey) {
+            activeDeleteEventId = eventId;
+            activeDeleteDateKey = dateKey;
+            const ev = events[eventId];
+
+            let allDays = [];
+            let curr = new Date(ev.startDate);
+            let last = new Date(ev.endDate);
+            while (curr <= last) {
+                allDays.push(curr.toISOString().split('T')[0]);
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            document.getElementById('deleteModalEventTitle').innerText = `ღონისძიება: ${ev.title}`;
+            document.getElementById('deleteOptionsBody').style.display = 'flex';
+            document.getElementById('customDeleteContainer').style.display = 'none';
+            document.getElementById('deleteOptionsModal').classList.add('active');
+        }
+
+        function closeDeleteOptionsModal() {
+            document.getElementById('deleteOptionsModal').classList.remove('active');
+        }
+
+        function executeDeleteChoice(choice) {
+            const ev = events[activeDeleteEventId];
+            if (choice === 1) {
+                showLoader();
+                setTimeout(() => {
+                    let allDays = [];
+                    let curr = new Date(ev.startDate);
+                    let last = new Date(ev.endDate);
+                    while (curr <= last) {
+                        allDays.push(curr.toISOString().split('T')[0]);
+                        curr.setDate(curr.getDate() + 1);
+                    }
+
+                    if (allDays.length <= 1) {
+                        delete events[activeDeleteEventId];
+                    } else if (activeDeleteDateKey === ev.startDate) {
+                        let nextD = new Date(ev.startDate);
+                        nextD.setDate(nextD.getDate() + 1);
+                        ev.startDate = nextD.toISOString().split('T')[0];
+                    } else if (activeDeleteDateKey === ev.endDate) {
+                        let prevD = new Date(ev.endDate);
+                        prevD.setDate(prevD.getDate() - 1);
+                        ev.endDate = prevD.toISOString().split('T')[0];
+                    } else {
+                        let prevD = new Date(activeDeleteDateKey);
+                        prevD.setDate(prevD.getDate() - 1);
+                        let nextD = new Date(activeDeleteDateKey);
+                        nextD.setDate(nextD.getDate() + 1);
+
+                        let newEvId = 'evt_' + Date.now();
+                        events[newEvId] = { ...ev, startDate: nextD.toISOString().split('T')[0] };
+                        ev.endDate = prevD.toISOString().split('T')[0];
+                    }
+                    localStorage.setItem('shogi_events', JSON.stringify(events));
+                    renderCalendar();
+                    if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
+                    closeDeleteOptionsModal();
+                    hideLoader();
+                    showToast("არჩეული დღე წაიშალა");
+                }, 200);
+
+            } else if (choice === 2) {
+                showLoader();
+                setTimeout(() => {
+                    let prevD = new Date(activeDeleteDateKey);
+                    prevD.setDate(prevD.getDate() - 1);
+                    if (prevD.toISOString().split('T')[0] < ev.startDate) {
+                        delete events[activeDeleteEventId];
+                    } else {
+                        ev.endDate = prevD.toISOString().split('T')[0];
+                    }
+                    localStorage.setItem('shogi_events', JSON.stringify(events));
+                    renderCalendar();
+                    if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
+                    closeDeleteOptionsModal();
+                    hideLoader();
+                    showToast("ამ და მომდევნო დღეების ღონისძიებები წაიშალა");
+                }, 200);
+
+            } else if (choice === 3) {
+                document.getElementById('deleteOptionsBody').style.display = 'none';
+                const container = document.getElementById('customDeleteDaysList');
+                container.innerHTML = '';
+
+                let curr = new Date(ev.startDate);
+                let last = new Date(ev.endDate);
+                while (curr <= last) {
+                    let dStr = curr.toISOString().split('T')[0];
+                    const label = document.createElement('label');
+                    label.style.display = 'flex';
+                    label.style.alignItems = 'center';
+                    label.style.gap = '8px';
+                    label.style.fontSize = '14px';
+                    label.innerHTML = `<input type="checkbox" value="${dStr}" class="custom-del-chk" style="width:16px; height:16px;"> ${dStr}`;
+                    container.appendChild(label);
+                    curr.setDate(curr.getDate() + 1);
+                }
+                document.getElementById('customDeleteContainer').style.display = 'flex';
+
+            } else if (choice === 4) {
+                showLoader();
+                setTimeout(() => {
+                    delete events[activeDeleteEventId];
+                    localStorage.setItem('shogi_events', JSON.stringify(events));
+                    renderCalendar();
+                    if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
+                    closeDeleteOptionsModal();
+                    hideLoader();
+                    showToast("ღონისძიება მთლიანად წაიშალა");
+                }, 200);
+            }
+        }
+
+        function backToDeleteOptionsMain() {
+            document.getElementById('customDeleteContainer').style.display = 'none';
+            document.getElementById('deleteOptionsBody').style.display = 'flex';
+        }
+
+        function confirmCustomDelete() {
+            const checkboxes = document.querySelectorAll('.custom-del-chk:checked');
+            const daysToRemove = Array.from(checkboxes).map(cb => cb.value);
+
+            if (daysToRemove.length === 0) {
+                showToast("არ არის მონიშნული არცერთი დღე", "error");
+                return;
+            }
+
+            showLoader();
+            setTimeout(() => {
+                const ev = events[activeDeleteEventId];
+                let curr = new Date(ev.startDate);
+                let last = new Date(ev.endDate);
+                let remainingDays = [];
+                while (curr <= last) {
+                    let dStr = curr.toISOString().split('T')[0];
+                    if (!daysToRemove.includes(dStr)) {
+                        remainingDays.push(dStr);
+                    }
+                    curr.setDate(curr.getDate() + 1);
+                }
+
+                if (remainingDays.length === 0) {
+                    delete events[activeDeleteEventId];
                 } else {
-                    renderCurrentMonth();
+                    ev.startDate = remainingDays[0];
+                    ev.endDate = remainingDays[remainingDays.length - 1];
+                }
+
+                localStorage.setItem('shogi_events', JSON.stringify(events));
+                closeDeleteOptionsModal();
+                renderCalendar();
+                if (currentActiveDayForKey) {
+                    renderDayDetailsList(currentActiveDayForKey);
+                }
+                hideLoader();
+                showToast("მონიშნული დღეები წარმატებით წაიშალა");
+            }, 200);
+        }
+
+        function updateDailyBanner() {
+            const now = new Date();
+            const currentHour = now.getHours();
+
+            let targetDate = new Date();
+            let isTomorrow = false;
+
+            if (currentHour >= 18) {
+                targetDate.setDate(targetDate.getDate() + 1);
+                isTomorrow = true;
+            }
+
+            const y = targetDate.getFullYear();
+            const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+            const d = String(targetDate.getDate()).padStart(2, '0');
+            
+            const dateStrFormatted = `${d}.${m}.${y.toString().slice(-2)}`;
+            const dateKeyQuery = `${y}-${m}-${d}`;
+
+            let dayEvents = [];
+            Object.keys(events).forEach(id => {
+                const ev = events[id];
+                if (isDateInRange(dateKeyQuery, ev.startDate, ev.endDate)) {
+                    const timeStr = ev.startTime ? ` (${ev.startTime})` : '';
+                    dayEvents.push(`${ev.title}${timeStr}`);
+                }
+            });
+
+            const bannerTextSpan = document.getElementById('alertText');
+            if (isTomorrow) {
+                if (dayEvents.length > 0) {
+                    bannerTextSpan.innerText = `${dateStrFormatted}-ში დაგეგმილია  ${dayEvents.join(', ')}`;
+                } else {
+                    bannerTextSpan.innerText = `${dateStrFormatted}-ში არაფერია დაგეგმილი`;
+                }
+            } else {
+                if (dayEvents.length > 0) {
+                    bannerTextSpan.innerText = `დღეს დაგეგმილია  ${dayEvents.join(', ')}`;
+                } else {
+                    bannerTextSpan.innerText = `დღეს არაფერია დაგეგმილი`;
                 }
             }
         }
-    };
-    
-    document.getElementById('cancelDelete').onclick = () => {
-        overlay.style.display = 'none';
-    };
-}
 
-function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    if (username === USERNAME && password === PASSWORD) {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        
-        loadData();
-        
-        const today = new Date();
-        currentDisplayYear = today.getFullYear();
-        currentDisplayMonth = today.getMonth();
-        
-        document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
-        
-        localStorage.setItem('isLoggedIn', 'true');
-    } else {
-        showPopup("მომხმარებლის სახელი ან პაროლი არასწორია!", "error");
-        document.getElementById('password').value = '';
-        document.getElementById('password').focus();
-        
-        const loginContainer = document.querySelector('.login-container');
-        loginContainer.classList.add('error-animation');
-        setTimeout(() => loginContainer.classList.remove('error-animation'), 500);
-    }
-}
-    
-function logout() {
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    localStorage.removeItem('isLoggedIn');
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-    monthlyData = {};
-}
-    
-    function addEnterKeySupport() {
-        const passwordField = document.getElementById('password');
-        if (passwordField) {
-            passwordField.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    login();
+        // 2. უფრო დახვეწილი ელეგანტური პოპაპი სისტემიდან გასვლისთვის
+        function confirmLogout() {
+            showCustomPopup({
+                title: "სისტემიდან გასვლა",
+                text: "ნამდვილად გსურთ სისტემიდან გასვლა? თქვენი სესია დაიხურება.",
+                showInput: false,
+                onConfirm: (confirmed) => {
+                    if (confirmed) {
+                        showLoader();
+                        setTimeout(() => {
+                            sessionStorage.removeItem('shogi_auth');
+                            window.location.reload();
+                        }, 400);
+                    }
                 }
             });
         }
-        
-        const usernameField = document.getElementById('username');
-        if (usernameField) {
-            usernameField.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    if (passwordField) passwordField.focus();
-                }
-            });
-        }
-    }
-    
-function checkAutoLogin() {
-    const savedLogin = localStorage.getItem('isLoggedIn');
-    if (savedLogin === 'true') {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        loadData();
-        
-        const today = new Date();
-        currentDisplayYear = today.getFullYear();
-        currentDisplayMonth = today.getMonth();
-        
-        document.getElementById('currentMonthLabel').textContent = `${georgianMonths[currentDisplayMonth]} ${currentDisplayYear}`;
-        
-    }
-}
-    
-window.onload = function() {
-    addEnterKeySupport();
-    checkAutoLogin();
-    
-    const today = new Date();
 
-    
-    const prevBtn = document.getElementById('prevMonthBtn');
-    const nextBtn = document.getElementById('nextMonthBtn');
-    
-    if (prevBtn) {
-        prevBtn.onclick = goPrevMonth;
-    } else {
-        console.error('prevMonthBtn not found');
-    }
-    
-    if (nextBtn) {
-        nextBtn.onclick = goNextMonth;
-    } else {
-        console.error('nextMonthBtn not found');
-    }
-};
-</script>
-
+        initApp();
+    </script>
 </body>
 </html>
