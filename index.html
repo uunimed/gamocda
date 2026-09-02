@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShogiCalendar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK-ები -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #4f46e5;
@@ -54,7 +59,6 @@
             padding: 24px;
         }
 
-        /* 3. შესვლის (Login) გვერდის დახვეწილი დიზაინი SVG ვექტორით */
         #loginScreen {
             display: none;
             position: fixed;
@@ -286,6 +290,20 @@
         .day-cell:hover { border-color: var(--primary); }
         .day-cell.other-month { opacity: 0.4; }
 
+        .day-cell.past-date {
+            background-color: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+            opacity: 0.75;
+        }
+        .day-cell.past-date .day-number {
+            color: #94a3b8 !important;
+            background-color: #e2e8f0 !important;
+        }
+        .day-cell.past-date .event-chip {
+            filter: saturate(0.55) brightness(0.85);
+            opacity: 0.85;
+        }
+
         .day-number {
             font-weight: 600;
             font-size: 14px;
@@ -497,18 +515,132 @@
             padding-top: 20px;
         }
 
-        .details-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .detail-item {
-            background: var(--bg-color);
-            border-left: 4px solid var(--primary);
-            padding: 12px;
-            border-radius: 0 8px 8px 0;
+        .details-list { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+        
+        .detail-card {
+            border-radius: 14px;
+            padding: 20px;
+            color: #ffffff;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.15);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-2px);
         }
 
-        /* 2. სისტემიდან გასვლის უფრო დახვეწილი, ელეგანტური პოპაპი */
+        .detail-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .detail-card-divider {
+            width: 1.5px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .detail-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.12);
+            padding: 12px 16px;
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .detail-period {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-desc {
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+
+        .detail-card-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .detail-btn-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .detail-btn-action:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .detail-btn-action.danger:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .custom-del-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+        }
+        
+        .custom-del-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .custom-del-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+        }
+        .custom-del-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--danger);
+            cursor: pointer;
+        }
+        .custom-del-item.selected {
+            background: #fef2f2;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
         .custom-popup-overlay {
             display: none;
             position: fixed;
@@ -644,7 +776,6 @@
 </head>
 <body>
 
-    <!-- 3. შესვლის (Login) მორგებული გვერდი SVG ვექტორით -->
     <div id="loginScreen">
         <div class="login-card">
             <div class="login-logo-box">
@@ -670,7 +801,6 @@
         </div>
     </div>
 
-    <!-- 2. სისტემიდან გასვლის უფრო დახვეწილი ელეგანტური პოპაპი -->
     <div class="custom-popup-overlay" id="customPopup">
         <div class="custom-popup-box">
             <div class="popup-icon-wrapper" id="popupIconBox">
@@ -697,7 +827,6 @@
     <div id="toastContainer"></div>
 
     <header>
-        <!-- 1. ShogiCalendar-ზე დაჭერამ ახორციელებს სრულ განახლებას გვერდის გადატვირთვის გარეშე -->
         <a class="logo-area" onclick="refreshSystemWithoutReload(); return false;" href="#">
             <svg viewBox="0 0 24 24">
                 <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/>
@@ -841,7 +970,7 @@
 
     <!-- ღონისძიების წაშლის კონტროლის Popup -->
     <div class="modal" id="deleteOptionsModal">
-        <div class="modal-content" style="max-width: 520px;">
+        <div class="modal-content" style="max-width: 480px;">
             <div class="modal-header">
                 <h3>ღონისძიების წაშლა</h3>
                 <button class="close-btn" onclick="closeDeleteOptionsModal()">
@@ -851,15 +980,14 @@
             <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;" id="deleteOptionsBody">
                 <p id="deleteModalEventTitle" style="font-weight: 600; font-size: 15px; color: var(--primary);"></p>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(1)">მხოლოდ ამ დღის წაშლა</button>
-                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(2)">ამ და მომდევნო ყველა დღის წაშლა</button>
-                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(3)">კონკრეტული დღეების ამორჩევა და წაშლა</button>
-                    <button class="btn btn-danger" style="justify-content: flex-start; padding: 12px;" onclick="executeDeleteChoice(4)">მთლიანი ღონისძიების წაშლა</button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="promptConfirmDeleteChoice(1)">მხოლოდ ამ დღის წაშლა</button>
+                    <button class="btn btn-outline" style="justify-content: flex-start; padding: 12px;" onclick="promptConfirmDeleteChoice(3)">კონკრეტული დღეების ამორჩევა და წაშლა</button>
+                    <button class="btn btn-danger" style="justify-content: flex-start; padding: 12px;" onclick="promptConfirmDeleteChoice(4)">მთლიანი ღონისძიების წაშლა</button>
                 </div>
             </div>
             <div id="customDeleteContainer" style="display: none; flex-direction: column; gap: 12px; margin-top: 10px;">
-                <div style="font-size: 13px; color: var(--text-muted);">მონიშნეთ ის დღეები, რომელთა წაშლაც გსურთ:</div>
-                <div id="customDeleteDaysList" style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);"></div>
+                <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">მონიშნეთ ის დღეები, რომელთა წაშლაც გსურთ:</div>
+                <div class="custom-del-grid" id="customDeleteDaysList"></div>
                 <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
                     <button class="btn btn-outline btn-sm" onclick="backToDeleteOptionsMain()">უკან</button>
                     <button class="btn btn-danger btn-sm" onclick="confirmCustomDelete()">არჩეულის წაშლა</button>
@@ -869,23 +997,59 @@
     </div>
 
     <script>
+        // Firebase კონფიგურაცია და ინიციალიზაცია
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPbKbAh4NYga07quvvFfFNsn2KqMN_frg",
+            authDomain: "khelmowera.firebaseapp.com",
+            databaseURL: "https://khelmowera-default-rtdb.firebaseio.com",
+            projectId: "khelmowera",
+            storageBucket: "khelmowera.firebasestorage.app",
+            messagingSenderId: "791642099572",
+            appId: "1:791642099572:web:23d79e75dcc5c96ee6e621",
+            measurementId: "G-XQ4B8H1S07"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let currentDate = new Date();
-        let events = JSON.parse(localStorage.getItem('shogi_events')) || {};
-        let eventTypes = JSON.parse(localStorage.getItem('shogi_types')) || ["სამსახური", "სწავლა", "პირადი"];
+        let events = {};
+        let eventTypes = ["სამსახური", "სწავლა", "პირადი"];
 
         let currentActiveDayForKey = null;
         let activeDeleteEventId = null;
         let activeDeleteDateKey = null;
 
-        // ავტორიზაციის შემოწმება ჩატვირთვისას
         window.addEventListener('DOMContentLoaded', () => {
             const isAuth = sessionStorage.getItem('shogi_auth');
             if (isAuth !== 'true') {
                 document.getElementById('loginScreen').classList.add('active');
             }
+            
+            // Firebase-იდან მონაცემების რეალურ დროში მოსმენა
+            db.ref('shogi_data').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    events = data.events || {};
+                    eventTypes = data.types || ["სამსახური", "სწავლა", "პირადი"];
+                } else {
+                    events = {};
+                    eventTypes = ["სამსახური", "სწავლა", "პირადი"];
+                }
+                renderTypesSelect();
+                renderTypesManageList();
+                renderCalendar();
+                updateDailyBanner();
+            });
         });
 
-        // 3. შესვლის (Login) დამუშავება
+        function syncToFirebase() {
+            db.ref('shogi_data').set({
+                events: events,
+                types: eventTypes
+            });
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUser').value.trim();
@@ -929,12 +1093,9 @@
             }
         }
 
-        // 1. ShogiCalendar-ზე დაჭერისას გვერდის განახლება (გარეშე გადატვირთვის)
         function refreshSystemWithoutReload() {
             showLoader();
             setTimeout(() => {
-                events = JSON.parse(localStorage.getItem('shogi_events')) || {};
-                eventTypes = JSON.parse(localStorage.getItem('shogi_types')) || ["სამსახური", "სწავლა", "პირადი"];
                 currentDate = new Date();
                 renderTypesSelect();
                 renderTypesManageList();
@@ -1030,18 +1191,6 @@
             }, 3000);
         }
 
-        function initApp() {
-            showLoader();
-            setTimeout(() => {
-                renderTypesSelect();
-                renderTypesManageList();
-                renderCalendar();
-                updateDailyBanner();
-                hideLoader();
-            }, 250);
-            setInterval(updateDailyBanner, 60000);
-        }
-
         function renderTypesSelect() {
             const select = document.getElementById('eventType');
             select.innerHTML = '';
@@ -1088,7 +1237,7 @@
             showLoader();
             setTimeout(() => {
                 eventTypes.push(val);
-                localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
+                syncToFirebase();
                 input.value = '';
                 renderTypesSelect();
                 renderTypesManageList();
@@ -1114,14 +1263,12 @@
                         showLoader();
                         setTimeout(() => {
                             eventTypes[index] = cleaned;
-                            localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
-                            
                             Object.keys(events).forEach(id => {
                                 if (events[id].type === oldName) {
                                     events[id].type = cleaned;
                                 }
                             });
-                            localStorage.setItem('shogi_events', JSON.stringify(events));
+                            syncToFirebase();
 
                             renderTypesSelect();
                             renderTypesManageList();
@@ -1142,7 +1289,7 @@
             showLoader();
             setTimeout(() => {
                 const removed = eventTypes.splice(index, 1)[0];
-                localStorage.setItem('shogi_types', JSON.stringify(eventTypes));
+                syncToFirebase();
                 renderTypesSelect();
                 renderTypesManageList();
                 hideLoader();
@@ -1168,13 +1315,17 @@
             }
 
             const today = new Date();
+            const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
             for (let i = 1; i <= lastDay; i++) {
                 const isToday = i === today.getDate() && month === today.getMonth() && year === today.getFullYear();
                 const formattedMonth = String(month + 1).padStart(2, '0');
                 const formattedDay = String(i).padStart(2, '0');
                 const dateKey = `${year}-${formattedMonth}-${formattedDay}`;
 
-                grid.appendChild(createDayCell(i, false, isToday, dateKey));
+                const isPast = dateKey < todayKey;
+
+                grid.appendChild(createDayCell(i, false, isToday, dateKey, isPast));
             }
 
             const totalCellsSoFar = firstDayIndex + lastDay;
@@ -1184,9 +1335,9 @@
             }
         }
 
-        function createDayCell(dayNum, isOtherMonth, isToday = false, dateKey = null) {
+        function createDayCell(dayNum, isOtherMonth, isToday = false, dateKey = null, isPast = false) {
             const cell = document.createElement('div');
-            cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
+            cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isPast ? 'past-date' : ''}`;
 
             const numberDiv = document.createElement('div');
             numberDiv.className = 'day-number';
@@ -1318,7 +1469,7 @@
                 }
 
                 events[id] = { title, desc, priority, type, startDate, endDate, startTime, endTime };
-                localStorage.setItem('shogi_events', JSON.stringify(events));
+                syncToFirebase();
                 
                 closeEventModal();
                 renderCalendar();
@@ -1354,20 +1505,32 @@
                 const ev = events[id];
                 if (isDateInRange(dateKey, ev.startDate, ev.endDate)) {
                     foundAny = true;
-                    const item = document.createElement('div');
-                    item.className = 'detail-item';
-                    item.style.borderLeftColor = priorityColors[ev.priority];
-                    const timeRange = ev.startTime ? ` (${ev.startTime} - ${ev.endTime || '...' })` : '';
                     
+                    const cardBgColor = priorityColors[ev.priority] || 'var(--primary)';
+                    const timeStr = ev.startTime ? `${ev.startTime}${ev.endTime ? ' - ' + ev.endTime : ''}` : 'დრო არ არის მითითებული';
+
+                    const item = document.createElement('div');
+                    item.className = 'detail-card';
+                    item.style.backgroundColor = cardBgColor;
+
                     item.innerHTML = `
-                        <div>
-                            <strong>${ev.title}</strong> <span style="font-size:12px; color:var(--text-muted);">(${ev.type})${timeRange}</span>
-                            <div style="font-size:13px; margin-top:4px;">${ev.desc || 'აღწერა არ არის'}</div>
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">პერიოდი: ${ev.startDate} / ${ev.endDate}</div>
+                        <div class="detail-card-header">
+                            <span>${ev.title}</span>
+                            <span class="detail-card-divider"></span>
+                            <span style="opacity: 0.9; font-weight: 500; font-size: 14px;">${ev.type}</span>
+                            <span class="detail-card-divider"></span>
+                            <span style="opacity: 0.85; font-size: 13px; font-weight: 400;">${timeStr}</span>
                         </div>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn btn-outline btn-sm" onclick="editEvent('${id}')">რედაქტირება</button>
-                            <button class="btn btn-danger btn-sm" onclick="openDeleteOptionsModal('${id}', '${dateKey}')">წაშლა</button>
+                        <div class="detail-card-body">
+                            <div class="detail-period">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                პერიოდი: ${ev.startDate} / ${ev.endDate}
+                            </div>
+                            <div class="detail-desc">${ev.desc ? ev.desc : 'აღწერა არ არის მითითებული'}</div>
+                        </div>
+                        <div class="detail-card-footer">
+                            <button class="detail-btn-action" onclick="editEvent('${id}')">რედაქტირება</button>
+                            <button class="detail-btn-action danger" onclick="openDeleteOptionsModal('${id}', '${dateKey}')">წაშლა</button>
                         </div>
                     `;
                     listContainer.appendChild(item);
@@ -1375,7 +1538,7 @@
             });
 
             if (!foundAny) {
-                listContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">ამ დღეს ღონისძიებები არ არის დაგეგმილი.</div>`;
+                listContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px; font-weight: 500;">ამ დღეს ღონისძიებები არ არის დაგეგმილი.</div>`;
             }
         }
 
@@ -1412,14 +1575,6 @@
             activeDeleteDateKey = dateKey;
             const ev = events[eventId];
 
-            let allDays = [];
-            let curr = new Date(ev.startDate);
-            let last = new Date(ev.endDate);
-            while (curr <= last) {
-                allDays.push(curr.toISOString().split('T')[0]);
-                curr.setDate(curr.getDate() + 1);
-            }
-
             document.getElementById('deleteModalEventTitle').innerText = `ღონისძიება: ${ev.title}`;
             document.getElementById('deleteOptionsBody').style.display = 'flex';
             document.getElementById('customDeleteContainer').style.display = 'none';
@@ -1428,6 +1583,28 @@
 
         function closeDeleteOptionsModal() {
             document.getElementById('deleteOptionsModal').classList.remove('active');
+        }
+
+        function promptConfirmDeleteChoice(choice) {
+            const ev = events[activeDeleteEventId];
+            let msg = "ნამდვილად გსურთ არჩეული მოქმედების შესრულება?";
+            if (choice === 1) {
+                msg = `ნამდვილად გსურთ ${activeDeleteDateKey} თარიღის წაშლა?`;
+            } else if (choice === 4) {
+                msg = `ნამდვილად გსურთ მთლიანი ღონისძიების ("${ev.title}") წაშლა?`;
+            }
+
+            showCustomPopup({
+                title: "წაშლის დადასტურება",
+                text: msg,
+                showInput: false,
+                onConfirm: (confirmed) => {
+                    if (confirmed) {
+                        closeDeleteOptionsModal();
+                        executeDeleteChoice(choice);
+                    }
+                }
+            });
         }
 
         function executeDeleteChoice(choice) {
@@ -1463,30 +1640,11 @@
                         events[newEvId] = { ...ev, startDate: nextD.toISOString().split('T')[0] };
                         ev.endDate = prevD.toISOString().split('T')[0];
                     }
-                    localStorage.setItem('shogi_events', JSON.stringify(events));
+                    syncToFirebase();
                     renderCalendar();
                     if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
-                    closeDeleteOptionsModal();
                     hideLoader();
                     showToast("არჩეული დღე წაიშალა");
-                }, 200);
-
-            } else if (choice === 2) {
-                showLoader();
-                setTimeout(() => {
-                    let prevD = new Date(activeDeleteDateKey);
-                    prevD.setDate(prevD.getDate() - 1);
-                    if (prevD.toISOString().split('T')[0] < ev.startDate) {
-                        delete events[activeDeleteEventId];
-                    } else {
-                        ev.endDate = prevD.toISOString().split('T')[0];
-                    }
-                    localStorage.setItem('shogi_events', JSON.stringify(events));
-                    renderCalendar();
-                    if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
-                    closeDeleteOptionsModal();
-                    hideLoader();
-                    showToast("ამ და მომდევნო დღეების ღონისძიებები წაიშალა");
                 }, 200);
 
             } else if (choice === 3) {
@@ -1498,13 +1656,13 @@
                 let last = new Date(ev.endDate);
                 while (curr <= last) {
                     let dStr = curr.toISOString().split('T')[0];
-                    const label = document.createElement('label');
-                    label.style.display = 'flex';
-                    label.style.alignItems = 'center';
-                    label.style.gap = '8px';
-                    label.style.fontSize = '14px';
-                    label.innerHTML = `<input type="checkbox" value="${dStr}" class="custom-del-chk" style="width:16px; height:16px;"> ${dStr}`;
-                    container.appendChild(label);
+                    const itemDiv = document.createElement('label');
+                    itemDiv.className = 'custom-del-item';
+                    itemDiv.innerHTML = `
+                        <input type="checkbox" value="${dStr}" class="custom-del-chk" onchange="toggleDelItemStyle(this)">
+                        <span>${dStr}</span>
+                    `;
+                    container.appendChild(itemDiv);
                     curr.setDate(curr.getDate() + 1);
                 }
                 document.getElementById('customDeleteContainer').style.display = 'flex';
@@ -1513,13 +1671,21 @@
                 showLoader();
                 setTimeout(() => {
                     delete events[activeDeleteEventId];
-                    localStorage.setItem('shogi_events', JSON.stringify(events));
+                    syncToFirebase();
                     renderCalendar();
                     if (currentActiveDayForKey) renderDayDetailsList(currentActiveDayForKey);
-                    closeDeleteOptionsModal();
                     hideLoader();
                     showToast("ღონისძიება მთლიანად წაიშალა");
                 }, 200);
+            }
+        }
+
+        function toggleDelItemStyle(chk) {
+            const parent = chk.closest('.custom-del-item');
+            if (chk.checked) {
+                parent.classList.add('selected');
+            } else {
+                parent.classList.remove('selected');
             }
         }
 
@@ -1537,36 +1703,45 @@
                 return;
             }
 
-            showLoader();
-            setTimeout(() => {
-                const ev = events[activeDeleteEventId];
-                let curr = new Date(ev.startDate);
-                let last = new Date(ev.endDate);
-                let remainingDays = [];
-                while (curr <= last) {
-                    let dStr = curr.toISOString().split('T')[0];
-                    if (!daysToRemove.includes(dStr)) {
-                        remainingDays.push(dStr);
+            showCustomPopup({
+                title: "წაშლის დადასტურება",
+                text: `ნამდვილად გსურთ მონიშნული ${daysToRemove.length} დღის წაშლა?`,
+                showInput: false,
+                onConfirm: (confirmed) => {
+                    if (confirmed) {
+                        showLoader();
+                        setTimeout(() => {
+                            const ev = events[activeDeleteEventId];
+                            let curr = new Date(ev.startDate);
+                            let last = new Date(ev.endDate);
+                            let remainingDays = [];
+                            while (curr <= last) {
+                                let dStr = curr.toISOString().split('T')[0];
+                                if (!daysToRemove.includes(dStr)) {
+                                    remainingDays.push(dStr);
+                                }
+                                curr.setDate(curr.getDate() + 1);
+                            }
+
+                            if (remainingDays.length === 0) {
+                                delete events[activeDeleteEventId];
+                            } else {
+                                ev.startDate = remainingDays[0];
+                                ev.endDate = remainingDays[remainingDays.length - 1];
+                            }
+
+                            syncToFirebase();
+                            closeDeleteOptionsModal();
+                            renderCalendar();
+                            if (currentActiveDayForKey) {
+                                renderDayDetailsList(currentActiveDayForKey);
+                            }
+                            hideLoader();
+                            showToast("მონიშნული დღეები წარმატებით წაიშალა");
+                        }, 200);
                     }
-                    curr.setDate(curr.getDate() + 1);
                 }
-
-                if (remainingDays.length === 0) {
-                    delete events[activeDeleteEventId];
-                } else {
-                    ev.startDate = remainingDays[0];
-                    ev.endDate = remainingDays[remainingDays.length - 1];
-                }
-
-                localStorage.setItem('shogi_events', JSON.stringify(events));
-                closeDeleteOptionsModal();
-                renderCalendar();
-                if (currentActiveDayForKey) {
-                    renderDayDetailsList(currentActiveDayForKey);
-                }
-                hideLoader();
-                showToast("მონიშნული დღეები წარმატებით წაიშალა");
-            }, 200);
+            });
         }
 
         function updateDailyBanner() {
@@ -1613,7 +1788,6 @@
             }
         }
 
-        // 2. უფრო დახვეწილი ელეგანტური პოპაპი სისტემიდან გასვლისთვის
         function confirmLogout() {
             showCustomPopup({
                 title: "სისტემიდან გასვლა",
@@ -1630,8 +1804,6 @@
                 }
             });
         }
-
-        initApp();
     </script>
 </body>
 </html>
