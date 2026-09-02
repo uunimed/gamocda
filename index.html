@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShogiCalendar</title>
+    <title>ShogiKalender</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Firebase SDKs -->
@@ -384,36 +384,41 @@
         }
         .modal.active { display: flex; }
 
-        .modal-content {
-            background: linear-gradient(to bottom, #ffffff, #fcfdff);
-            padding: 36px;
-            border-radius: 20px;
-            width: 100%;
-            max-height: 100%; 
-            overflow-y: auto;
-            box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
+.modal-content {
+        position: relative;
+        background: linear-gradient(to bottom, #ffffff, #fcfdff);
+        padding: 36px;
+        border-radius: 20px;
+        width: 100%;
+        max-height: 100%; 
+        overflow-y: auto;
+        box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 16px;
-        }
-        .modal-header h3 { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 16px;
+        padding-right: 40px;
+    }
 
-        .close-btn {
-            background: #f1f5f9; border: none; cursor: pointer; color: var(--text-muted);
-            width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .close-btn:hover { background: #fee2e2; color: var(--danger); transform: scale(1.05); }
-        .close-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; }
+    .close-btn {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        background: #f1f5f9; border: none; cursor: pointer; color: var(--text-muted);
+        width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s ease;
+        z-index: 10;
+    }
+    .close-btn:hover { background: #fee2e2; color: var(--danger); transform: scale(1.05); }
+    .close-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
@@ -882,11 +887,21 @@
             .modal {
                 padding: 12px;
             }
-            .modal-content {
-                padding: 20px;
-                max-height: 90vh;
-                gap: 16px;
-            }
+.modal-content {
+            padding: 20px;
+            max-height: 90vh;
+            gap: 16px;
+        }
+        .modal-header {
+            padding-right: 35px;
+            padding-bottom: 12px;
+        }
+        .close-btn {
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+        }
             .form-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -924,19 +939,19 @@
                 </svg>
             </div>
             <div class="login-title-area">
-                <h2>ShogiCalendar</h2>
-                <p>Authentifizierung erforderlich</p>
+                <h2>ShogiKalender</h2>
+                <p></p>
             </div>
             <form class="login-form" onsubmit="handleLogin(event)">
                 <div class="login-input-group">
-                    <label for="loginUser">Benutzerkennung</label>
-                    <input type="text" id="loginUser" class="login-input" placeholder="Benutzername eingeben" required>
+                    <label for="loginUser"></label>
+                    <input type="text" id="loginUser" class="login-input" placeholder="Benutzername" required>
                 </div>
                 <div class="login-input-group">
-                    <label for="loginPass">Passwort</label>
-                    <input type="password" id="loginPass" class="login-input" placeholder="Passwort eingeben" required>
+                    <label for="loginPass"></label>
+                    <input type="password" id="loginPass" class="login-input" placeholder="Passwort" required>
                 </div>
-                <button type="submit" class="login-btn">Anmelden</button>
+                <button type="submit" class="login-btn">anmelden</button>
             </form>
         </div>
     </div>
@@ -954,8 +969,8 @@
                 <input type="text" id="customPopupInput" class="form-control" placeholder="">
             </div>
             <div class="popup-actions-grid" id="popupActionsGrid">
-                <button class="btn btn-outline" id="customPopupCancelBtn" onclick="closeCustomPopup(false)" style="justify-content: center; padding: 12px;">Abbrechen</button>
-                <button class="btn btn-danger" id="customPopupConfirmBtn" onclick="closeCustomPopup(true)" style="justify-content: center; padding: 12px;" data-action-type="delete">Löschen</button>
+                <button class="btn btn-outline" id="customPopupCancelBtn" onclick="closeCustomPopup(false)" style="justify-content: center; padding: 12px;">abbrechen</button>
+                <button class="btn btn-danger" id="customPopupConfirmBtn" onclick="closeCustomPopup(true)" style="justify-content: center; padding: 12px;" data-action-type="delete">löschen</button>
             </div>
         </div>
     </div>
@@ -972,7 +987,7 @@
             <svg viewBox="0 0 24 24">
                 <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/>
             </svg>
-            <h1>ShogiCalendar</h1>
+            <h1>ShogiKalender</h1>
         </a>
         <div class="header-actions">
             <button class="btn btn-primary" onclick="openEventModal()">
@@ -981,14 +996,14 @@
             </button>
             <button class="btn btn-danger" onclick="confirmLogout()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 22H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h5"></path><polyline points="17 16 21 12 17 8"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                Abmelden
+                abmelden
             </button>
         </div>
     </header>
 
     <div class="daily-alert-banner" id="dailyAlertBanner">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        <span id="alertText">Terminübersicht wird geladen...</span>
+        <span id="alertText">wird geladen...</span>
     </div>
 
     <div class="calendar-container">
@@ -1024,11 +1039,11 @@
             <div class="form-grid">
                 <div class="form-group full">
                     <label for="eventTitle">Bezeichnung</label>
-                    <input type="text" id="eventTitle" class="form-control required-field" placeholder="Terminbezeichnung eingeben" onblur="validateField(this)">
+                    <input type="text" id="eventTitle" class="form-control required-field" placeholder="" onblur="validateField(this)">
                 </div>
 
                 <div class="form-group">
-                    <label for="eventStartDate">Beginndatum</label>
+                    <label for="eventStartDate">Beginn</label>
                     <div class="date-picker-wrapper">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <input type="date" id="eventStartDate" class="required-field" onblur="validateField(this)">
@@ -1036,7 +1051,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="eventEndDate">Enddatum</label>
+                    <label for="eventEndDate">End</label>
                     <div class="date-picker-wrapper">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <input type="date" id="eventEndDate" onblur="validateField(this)">
@@ -1073,8 +1088,8 @@
                     <label>Kategorienverwaltung</label>
                     <div class="types-manager-box">
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="newTypeName" class="form-control" placeholder="Neue Kategorie benennen..." style="flex:1; background: #ffffff;">
-                            <button class="btn btn-primary" onclick="addNewType()" style="padding: 0 20px;">Hinzufügen</button>
+                            <input type="text" id="newTypeName" class="form-control" placeholder="" style="flex:1; background: #ffffff;">
+                            <button class="btn btn-primary" onclick="addNewType()" style="padding: 0 20px;">hinzufügen</button>
                         </div>
                         <div class="types-chips-container" id="typesManageList"></div>
                     </div>
@@ -1082,15 +1097,15 @@
 
                 <div class="form-group full">
                     <label for="eventDesc">Detaillierte Beschreibung</label>
-                    <textarea id="eventDesc" class="form-control" rows="3" placeholder="Zusätzliche Informationen erfassen..."></textarea>
+                    <textarea id="eventDesc" class="form-control" rows="3" placeholder=""></textarea>
                 </div>
             </div>
 
             <input type="hidden" id="eventId">
 
             <div class="modal-actions">
-                <button class="btn btn-outline" onclick="closeEventModal()">Abbrechen</button>
-                <button class="btn btn-primary" onclick="saveEvent()">Speichern</button>
+                <button class="btn btn-outline" onclick="closeEventModal()">abbrechen</button>
+                <button class="btn btn-primary" onclick="saveEvent()">speichern</button>
             </div>
         </div>
     </div>
@@ -1249,32 +1264,43 @@
         }
 
         let customPopupCallback = null;
-        function showCustomPopup({ title, text, showInput = false, inputValue = '', confirmText = 'Bestätigen', onConfirm }) {
-            document.getElementById('customPopupTitle').innerText = title;
-            document.getElementById('customPopupText').innerText = text;
+function showCustomPopup({ title, text, showInput = false, inputValue = '', confirmText = 'Bestätigen', onConfirm }) {
+    document.getElementById('customPopupTitle').innerText = title;
+    document.getElementById('customPopupText').innerText = text;
 
-            const confirmBtn = document.getElementById('customPopupConfirmBtn');
-            confirmBtn.innerText = confirmText;
-            if (confirmText === 'Abmelden' || confirmText === 'Löschen') {
-                confirmBtn.className = 'btn btn-danger';
-            } else {
-                confirmBtn.className = 'btn btn-primary';
-            }
+    const iconBox = document.getElementById('popupIconBox');
+    if (confirmText === 'Abmelden') {
+        iconBox.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
+        iconBox.style.background = '#e0e7ff';
+        iconBox.style.color = '#4f46e5';
+    } else {
+        iconBox.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+        iconBox.style.background = '#fee2e2';
+        iconBox.style.color = 'var(--danger)';
+    }
 
-            const inputContainer = document.getElementById('customPopupInputContainer');
-            const inputField = document.getElementById('customPopupInput');
+    const confirmBtn = document.getElementById('customPopupConfirmBtn');
+    confirmBtn.innerText = confirmText;
+    if (confirmText === 'Abmelden' || confirmText === 'Löschen') {
+        confirmBtn.className = 'btn btn-danger';
+    } else {
+        confirmBtn.className = 'btn btn-primary';
+    }
 
-            if (showInput) {
-                inputContainer.style.display = 'block';
-                inputField.value = inputValue;
-                setTimeout(() => inputField.focus(), 50);
-            } else {
-                inputContainer.style.display = 'none';
-            }
+    const inputContainer = document.getElementById('customPopupInputContainer');
+    const inputField = document.getElementById('customPopupInput');
 
-            customPopupCallback = onConfirm;
-            document.getElementById('customPopup').classList.add('active');
-        }
+    if (showInput) {
+        inputContainer.style.display = 'block';
+        inputField.value = inputValue;
+        setTimeout(() => inputField.focus(), 50);
+    } else {
+        inputContainer.style.display = 'none';
+    }
+
+    customPopupCallback = onConfirm;
+    document.getElementById('customPopup').classList.add('active');
+}
 
         function closeCustomPopup(confirmed) {
             document.getElementById('customPopup').classList.remove('active');
@@ -1294,7 +1320,7 @@
                 renderCalendar();
                 updateDailyBanner();
                 hideLoader();
-                showToast("System erfolgreich synchronisiert.");
+                showToast("System synchronisiert.");
             }, 200);
         }
 
@@ -1402,10 +1428,10 @@
                 pill.innerHTML = `
                     <span>${t}</span>
                     <div style="display:flex; gap:6px; align-items:center; margin-left:6px;">
-                        <button type="button" onclick="editTypePrompt(${index})" title="Modifizieren" style="color:var(--primary);">
+                        <button type="button" onclick="editTypePrompt(${index})" title="modifizieren" style="color:var(--primary);">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
-                        <button type="button" onclick="deleteType(${index})" title="Entfernen" class="del-btn">
+                        <button type="button" onclick="deleteType(${index})" title="entfernen" class="del-btn">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
@@ -1444,7 +1470,7 @@
                 text: "Geben Sie die aktualisierte Kategoribezeichnung ein:",
                 showInput: true,
                 inputValue: oldName,
-                confirmText: "Speichern",
+                confirmText: "speichern",
                 onConfirm: (confirmed, newVal) => {
                     if (confirmed && newVal && newVal.trim() !== "" && newVal.trim() !== oldName) {
                         const cleaned = newVal.trim();
@@ -2183,7 +2209,7 @@
         function confirmLogout() {
             showCustomPopup({
                 title: "Sitzung beenden",
-                text: "Möchten Sie die Sitzung tatsächlich beenden? Alle aktiven Prozesse werden geschlossen.",
+                text: "",
                 showInput: false,
                 confirmText: "Abmelden",
                 onConfirm: (confirmed) => {
